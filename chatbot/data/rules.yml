@@ -1,0 +1,38 @@
+version: "3.1"
+
+rules:
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Say 'I am a bot' anytime the user challenges
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: Respond to health data requests
+  steps:
+  - intent: view_health_data
+  - action: action_view_health_data
+
+- rule: Respond to risk prediction requests
+  steps:
+  - intent: predict_risk
+  - action: action_predict_risk
+
+- rule: Respond to reminder requests
+  steps:
+  - intent: set_reminder
+  - action: action_set_reminder
+
+- rule: Provide health advice
+  steps:
+  - intent: ask_health_question
+  - action: action_health_advice
+
+- rule: Help with medication
+  steps:
+  - intent: medication_help
+  - action: action_medication_help

@@ -1,0 +1,49 @@
+{
+  "name": "medimitra",
+  "version": "1.0.0",
+  "description": "Medical Health Tracker – Pro - Full-stack health monitoring platform",
+  "main": "index.js",
+  "author": {
+    "name": "Shashwat Awasthi",
+    "email": "shashwat.awasthi@example.com",
+    "url": "https://github.com/shashwat-a18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shashwat-a18/medimitra"
+  },
+  "scripts": {
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "dev:ml": "cd ml-server && python app.py",
+    "dev:chatbot": "cd chatbot && python simple_chatbot.py",
+    "build:client": "cd client && npm run build",
+    "start:client": "cd client && npm start",
+    "start:server": "cd server && npm start",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "keywords": [
+    "health",
+    "medical",
+    "tracker",
+    "ai",
+    "machine-learning",
+    "react",
+    "nextjs",
+    "nodejs",
+    "mongodb",
+    "flask",
+    "rasa"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "axios": "^1.10.0"
+  }
+}

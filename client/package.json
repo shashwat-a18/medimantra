@@ -1,0 +1,32 @@
+{
+  "name": "medimitra-client",
+  "version": "0.1.0",
+  "private": true,
+  "author": {
+    "name": "Shashwat Awasthi",
+    "email": "shashwat.awasthi@example.com",
+    "url": "https://github.com/shashwat-a18"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "autoprefixer": "latest",
+    "axios": "^1.10.0",
+    "next": "latest",
+    "postcss": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-icons": "^5.5.0",
+    "recharts": "latest",
+    "tailwindcss": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "latest"
+  }
+}

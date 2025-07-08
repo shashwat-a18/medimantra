@@ -1,0 +1,3 @@
+<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+
+This project is a full-stack, offline-capable Medical Health Tracker platform (Medical Health Tracker – Pro) using MERN (MongoDB, Express, React/Next.js, Node.js), Next.js, Flask, and Rasa. Follow the provided folder and file structure, and use only self-hosted solutions (no external APIs). Scaffold all major components, models, controllers, and configuration as described in the project plan.

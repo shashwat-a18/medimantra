@@ -1,0 +1,59 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - view_health_data
+  - predict_risk
+  - set_reminder
+  - ask_health_question
+  - medication_help
+
+entities:
+  - health_condition
+  - medication_name
+  - reminder_type
+
+slots:
+  user_id:
+    type: text
+    mappings:
+    - type: from_text
+  health_condition:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: health_condition
+  medication_name:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: medication_name
+
+responses:
+  utter_greet:
+  - text: "Hello! I'm your health assistant. How can I help you today?"
+  
+  utter_goodbye:
+  - text: "Goodbye! Take care of your health!"
+  
+  utter_iamabot:
+  - text: "I am a health assistant bot, powered by MediMitra."
+  
+  utter_health_data_help:
+  - text: "I can help you view your recent health records, track your vitals, and analyze your health trends."
+  
+  utter_prediction_help:
+  - text: "I can provide health risk assessments for diabetes, heart disease, and stroke based on your health data."
+  
+  utter_reminder_help:
+  - text: "I can help you set up medication reminders, appointment alerts, and health check-up notifications."
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

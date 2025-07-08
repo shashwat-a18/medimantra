@@ -1,0 +1,60 @@
+version: "3.1"
+
+stories:
+
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_great
+  - action: utter_happy
+
+- story: sad path 1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: affirm
+  - action: utter_happy
+
+- story: sad path 2
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: deny
+  - action: utter_goodbye
+
+- story: health data inquiry
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: view_health_data
+  - action: action_view_health_data
+
+- story: risk prediction flow
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: predict_risk
+  - action: action_predict_risk
+  - intent: affirm
+  - action: utter_happy
+
+- story: reminder setup
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: set_reminder
+  - action: action_set_reminder
+
+- story: health advice request
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_health_question
+  - action: action_health_advice
