@@ -1,8 +1,9 @@
-const axios = require('axios');
+const EnhancedChatbotService = require('../services/chatbotService');
 
-const RASA_SERVER_URL = process.env.RASA_SERVER_URL || 'http://localhost:5005';
+// Initialize the enhanced chatbot service
+const chatbotService = new EnhancedChatbotService();
 
-// Send message to Rasa chatbot
+// Send message to Enhanced Chatbot
 exports.sendMessage = async (req, res) => {
   try {
     const { message, sender } = req.body;
@@ -14,33 +15,44 @@ exports.sendMessage = async (req, res) => {
       });
     }
 
-    // Try to send message to Rasa server
-    try {
-      const response = await axios.post(`${RASA_SERVER_URL}/webhooks/rest/webhook`, {
-        sender: sender || 'user',
-        message: message
-      }, {
-        timeout: 5000
-      });
+    console.log(`📩 Processing message from ${sender || 'anonymous'}: "${message}"`);
 
-      res.json({
-        success: true,
-        data: response.data
-      });
-    } catch (rasaError) {
-      // If Rasa server is not available, provide fallback response
-      console.log('Rasa server not available, providing fallback response');
-      
-      const fallbackResponse = getFallbackResponse(message);
-      
-      res.json({
-        success: true,
-        data: [{ text: fallbackResponse }],
-        fallback: true
-      });
+    // Process message with enhanced chatbot service
+    const response = await chatbotService.processMessage(message, sender || 'anonymous');
+
+    // Format response for client
+    const formattedResponse = {
+      text: response.text,
+      buttons: response.actions?.map(action => ({
+        title: action.text,
+        payload: JSON.stringify(action)
+      })) || [],
+      quick_replies: response.quickReplies?.map(reply => ({
+        content_type: "text",
+        title: reply,
+        payload: reply.toLowerCase().replace(/\s+/g, '_')
+      })) || []
+    };
+
+    // Add severity check if present
+    if (response.severityCheck) {
+      formattedResponse.severity_check = response.severityCheck;
     }
+
+    // Log successful processing
+    if (response.metadata) {
+      console.log(`✅ Response generated - Intent: ${response.metadata.intent} (${response.metadata.confidence}% confidence)`);
+    }
+
+    res.json({
+      success: true,
+      data: [formattedResponse],
+      metadata: response.metadata,
+      enhanced: true
+    });
+
   } catch (error) {
-    console.error('Chatbot error:', error);
+    console.error('❌ Chatbot error:', error);
     res.status(500).json({ 
       success: false, 
       error: 'Internal server error' 
@@ -66,31 +78,55 @@ exports.getChatHistory = async (req, res) => {
   }
 };
 
-// Simple fallback responses when Rasa is not available
-function getFallbackResponse(message) {
-  const lowerMessage = message.toLowerCase();
-  
-  if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-    return "Hello! I'm your health assistant. How can I help you today?";
+// Get chatbot status and capabilities
+exports.getChatbotStatus = async (req, res) => {
+  try {
+    const status = chatbotService.getStatus();
+    
+    res.json({
+      success: true,
+      data: status
+    });
+  } catch (error) {
+    console.error('Error getting chatbot status:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Internal server error' 
+    });
   }
-  
-  if (lowerMessage.includes('help')) {
-    return "I can help you with health-related questions, appointment scheduling, and medication reminders. What would you like to know?";
+};
+
+// Parse intent from message (for testing/debugging)
+exports.parseIntent = async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    if (!text) {
+      return res.status(400).json({
+        success: false,
+        error: 'Text is required for intent parsing'
+      });
+    }
+
+    // Get intent classification
+    const { intent, confidence } = chatbotService.classifier.classify(text);
+
+    res.json({
+      success: true,
+      data: {
+        text,
+        intent: { name: intent, confidence },
+        entities: [],
+        intent_ranking: [{ name: intent, confidence }]
+      }
+    });
+  } catch (error) {
+    console.error('Error parsing intent:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Internal server error' 
+    });
   }
-  
-  if (lowerMessage.includes('appointment')) {
-    return "I can help you schedule an appointment. Please visit the appointments section in your dashboard.";
-  }
-  
-  if (lowerMessage.includes('medication') || lowerMessage.includes('medicine')) {
-    return "For medication reminders, please check the reminders section in your dashboard.";
-  }
-  
-  if (lowerMessage.includes('symptom')) {
-    return "For symptom tracking and health predictions, please visit the health section in your dashboard.";
-  }
-  
-  return "I'm here to help with your health-related questions. You can ask me about appointments, medications, symptoms, or general health advice.";
-}
+};
 
 module.exports = exports;

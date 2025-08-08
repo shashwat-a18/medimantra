@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
-import Navigation from '../../components/Navigation';
-import HealthTipsMarquee from '../../components/HealthTipsMarquee';
+import DashboardLayout from '../../components/DashboardLayout';
+import { Card, Button, Input, HealthMetricCard, Badge } from '../../components/ui/ModernComponents';
 import axios from 'axios';
 
 interface HealthRecord {
@@ -34,6 +34,7 @@ export default function HealthTracking() {
   const [showForm, setShowForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState<HealthRecord | null>(null);
   const [error, setError] = useState('');
+  const [activeView, setActiveView] = useState<'overview' | 'records' | 'trends'>('overview');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -59,10 +60,10 @@ export default function HealthTracking() {
 
   const fetchHealthRecords = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/health/records`, {
+      const response = await axios.get(`${API_BASE_URL}/health`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setHealthRecords(response.data.healthRecords || []);
+      setHealthRecords(response.data.records || []);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch health records');
     } finally {
@@ -74,37 +75,36 @@ export default function HealthTracking() {
     e.preventDefault();
     setError('');
 
-    try {
-      const recordData = {
-        date: formData.date,
-        vitals: {
-          ...(formData.weight && { weight: parseFloat(formData.weight) }),
-          ...(formData.height && { height: parseFloat(formData.height) }),
-          ...(formData.systolic && formData.diastolic && {
-            bloodPressure: {
-              systolic: parseInt(formData.systolic),
-              diastolic: parseInt(formData.diastolic)
-            }
-          }),
-          ...(formData.heartRate && { heartRate: parseInt(formData.heartRate) }),
-          ...(formData.temperature && { temperature: parseFloat(formData.temperature) }),
-          ...(formData.bloodSugar && { bloodSugar: parseFloat(formData.bloodSugar) })
-        },
-        ...(formData.symptoms && { symptoms: formData.symptoms.split(',').map(s => s.trim()) }),
-        ...(formData.notes && { notes: formData.notes })
-      };
+    const recordData = {
+      date: formData.date,
+      vitals: {
+        ...(formData.weight && { weight: parseFloat(formData.weight) }),
+        ...(formData.height && { height: parseFloat(formData.height) }),
+        ...(formData.systolic && formData.diastolic && {
+          bloodPressure: {
+            systolic: parseInt(formData.systolic),
+            diastolic: parseInt(formData.diastolic)
+          }
+        }),
+        ...(formData.heartRate && { heartRate: parseInt(formData.heartRate) }),
+        ...(formData.temperature && { temperature: parseFloat(formData.temperature) }),
+        ...(formData.bloodSugar && { bloodSugar: parseFloat(formData.bloodSugar) })
+      },
+      ...(formData.symptoms && { symptoms: formData.symptoms.split(',').map(s => s.trim()) }),
+      ...(formData.notes && { notes: formData.notes })
+    };
 
+    try {
       if (editingRecord) {
-        await axios.put(`${API_BASE_URL}/health/records/${editingRecord._id}`, recordData, {
+        await axios.put(`${API_BASE_URL}/health/${editingRecord._id}`, recordData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        await axios.post(`${API_BASE_URL}/health/records`, recordData, {
+        await axios.post(`${API_BASE_URL}/health`, recordData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
 
-      // Reset form and refresh list
       setFormData({
         date: new Date().toISOString().split('T')[0],
         weight: '',
@@ -128,11 +128,11 @@ export default function HealthTracking() {
   const handleEdit = (record: HealthRecord) => {
     setEditingRecord(record);
     setFormData({
-      date: record.date.split('T')[0],
+      date: new Date(record.date).toISOString().split('T')[0],
       weight: record.vitals.weight?.toString() || '',
       height: record.vitals.height?.toString() || '',
-      systolic: record.vitals.bloodPressure?.systolic?.toString() || '',
-      diastolic: record.vitals.bloodPressure?.diastolic?.toString() || '',
+      systolic: record.vitals.bloodPressure?.systolic.toString() || '',
+      diastolic: record.vitals.bloodPressure?.diastolic.toString() || '',
       heartRate: record.vitals.heartRate?.toString() || '',
       temperature: record.vitals.temperature?.toString() || '',
       bloodSugar: record.vitals.bloodSugar?.toString() || '',
@@ -146,7 +146,7 @@ export default function HealthTracking() {
     if (!confirm('Are you sure you want to delete this health record?')) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/health/records/${id}`, {
+      await axios.delete(`${API_BASE_URL}/health/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchHealthRecords();
@@ -155,368 +155,527 @@ export default function HealthTracking() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+  const getLatestVitals = () => {
+    if (healthRecords.length === 0) return null;
+    
+    const latest = healthRecords[0];
+    return latest.vitals;
   };
 
-  const calculateBMI = (weight: number, height: number) => {
+  const calculateBMI = (weight?: number, height?: number) => {
+    if (!weight || !height) return null;
     const heightInMeters = height / 100;
-    const bmi = weight / (heightInMeters * heightInMeters);
-    return bmi.toFixed(1);
+    return (weight / (heightInMeters * heightInMeters)).toFixed(1);
   };
 
-  const getBMICategory = (bmi: number) => {
-    if (bmi < 18.5) return { category: 'Underweight', color: 'text-blue-600' };
-    if (bmi < 25) return { category: 'Normal', color: 'text-green-600' };
-    if (bmi < 30) return { category: 'Overweight', color: 'text-yellow-600' };
-    return { category: 'Obese', color: 'text-red-600' };
+  const getBMIStatus = (bmi: number) => {
+    if (bmi < 18.5) return { status: 'Underweight', color: 'blue' as const };
+    if (bmi < 25) return { status: 'Normal', color: 'green' as const };
+    if (bmi < 30) return { status: 'Overweight', color: 'yellow' as const };
+    return { status: 'Obese', color: 'red' as const };
+  };
+
+  const getBloodPressureStatus = (systolic: number, diastolic: number) => {
+    if (systolic < 120 && diastolic < 80) return { status: 'Normal', color: 'green' as const };
+    if (systolic < 130 && diastolic < 80) return { status: 'Elevated', color: 'yellow' as const };
+    if (systolic < 140 || diastolic < 90) return { status: 'High Stage 1', color: 'red' as const };
+    return { status: 'High Stage 2', color: 'red' as const };
   };
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner"></div>
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      </DashboardLayout>
     );
   }
 
+  const latestVitals = getLatestVitals();
+  const bmi = latestVitals ? calculateBMI(latestVitals.weight, latestVitals.height) : null;
+  const bmiStatus = bmi ? getBMIStatus(parseFloat(bmi)) : null;
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation variant="dashboard" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Health Tracking</h1>
-            <p className="text-gray-600 mt-2">
-              Track your vital signs, symptoms, and overall health metrics
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              setShowForm(true);
-              setEditingRecord(null);
-              setFormData({
-                date: new Date().toISOString().split('T')[0],
-                weight: '',
-                height: '',
-                systolic: '',
-                diastolic: '',
-                heartRate: '',
-                temperature: '',
-                bloodSugar: '',
-                symptoms: '',
-                notes: ''
-              });
-            }}
-            className="btn-primary"
-          >
-            <span className="mr-2">+</span>
-            Add Health Record
-          </button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+            Health Tracking
+          </h1>
+          <p className="text-gray-400">
+            Monitor your vital signs and health metrics over time
+          </p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex space-x-1 mb-8">
+          {[
+            { id: 'overview', label: 'Overview', icon: '📊' },
+            { id: 'records', label: 'Records', icon: '📋' },
+            { id: 'trends', label: 'Trends', icon: '📈' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveView(tab.id as any)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2 ${
+                activeView === tab.id
+                  ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
+          <Card className="mb-6 p-4 bg-red-50 border border-red-200">
+            <p className="text-red-700">{error}</p>
+          </Card>
         )}
 
-        {/* Health Record Form */}
-        {showForm && (
-          <div className="mb-8 bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-6">
-              {editingRecord ? 'Edit Health Record' : 'Add New Health Record'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Overview Tab */}
+        {activeView === 'overview' && (
+          <div className="space-y-8">
+            {/* Latest Vitals */}
+            {latestVitals ? (
               <div>
-                <label className="form-label">Date</label>
-                <input
-                  type="date"
-                  className="form-input max-w-xs"
-                  value={formData.date}
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  required
-                />
-              </div>
+                <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+                  <span className="text-2xl mr-3">📊</span>
+                  Latest Vitals
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {latestVitals.weight && (
+                    <HealthMetricCard
+                      title="Weight"
+                      value={`${latestVitals.weight} kg`}
+                      icon="⚖️"
+                      change={bmi ? `BMI: ${bmi}` : undefined}
+                      color={bmiStatus?.color || 'blue'}
+                    />
+                  )}
+                  
+                  {latestVitals.bloodPressure && (
+                    <HealthMetricCard
+                      title="Blood Pressure"
+                      value={`${latestVitals.bloodPressure.systolic}/${latestVitals.bloodPressure.diastolic}`}
+                      icon="❤️"
+                      change={getBloodPressureStatus(latestVitals.bloodPressure.systolic, latestVitals.bloodPressure.diastolic).status}
+                      color={getBloodPressureStatus(latestVitals.bloodPressure.systolic, latestVitals.bloodPressure.diastolic).color}
+                    />
+                  )}
 
-              {/* Vital Signs */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Vital Signs</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="form-label">Weight (kg)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      className="form-input"
-                      value={formData.weight}
-                      onChange={(e) => setFormData({...formData, weight: e.target.value})}
-                      placeholder="70.5"
+                  {latestVitals.heartRate && (
+                    <HealthMetricCard
+                      title="Heart Rate"
+                      value={`${latestVitals.heartRate} bpm`}
+                      icon="💗"
+                      color={latestVitals.heartRate > 100 ? 'red' as const : latestVitals.heartRate < 60 ? 'yellow' as const : 'green' as const}
                     />
-                  </div>
-                  <div>
-                    <label className="form-label">Height (cm)</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.height}
-                      onChange={(e) => setFormData({...formData, height: e.target.value})}
-                      placeholder="175"
+                  )}
+
+                  {latestVitals.temperature && (
+                    <HealthMetricCard
+                      title="Temperature"
+                      value={`${latestVitals.temperature}°C`}
+                      icon="🌡️"
+                      color={latestVitals.temperature > 37.5 ? 'red' as const : 'green' as const}
                     />
-                  </div>
-                  <div>
-                    <label className="form-label">Heart Rate (bpm)</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.heartRate}
-                      onChange={(e) => setFormData({...formData, heartRate: e.target.value})}
-                      placeholder="72"
+                  )}
+
+                  {latestVitals.bloodSugar && (
+                    <HealthMetricCard
+                      title="Blood Sugar"
+                      value={`${latestVitals.bloodSugar} mg/dL`}
+                      icon="🩸"
+                      color={latestVitals.bloodSugar > 140 ? 'red' as const : latestVitals.bloodSugar < 70 ? 'yellow' as const : 'green' as const}
                     />
-                  </div>
-                  <div>
-                    <label className="form-label">Blood Pressure (Systolic)</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.systolic}
-                      onChange={(e) => setFormData({...formData, systolic: e.target.value})}
-                      placeholder="120"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">Blood Pressure (Diastolic)</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.diastolic}
-                      onChange={(e) => setFormData({...formData, diastolic: e.target.value})}
-                      placeholder="80"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">Temperature (°F)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      className="form-input"
-                      value={formData.temperature}
-                      onChange={(e) => setFormData({...formData, temperature: e.target.value})}
-                      placeholder="98.6"
-                    />
-                  </div>
-                  <div>
-                    <label className="form-label">Blood Sugar (mg/dL)</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      value={formData.bloodSugar}
-                      onChange={(e) => setFormData({...formData, bloodSugar: e.target.value})}
-                      placeholder="100"
-                    />
-                  </div>
+                  )}
                 </div>
               </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <span className="text-6xl mb-4 block">📊</span>
+                <h3 className="text-xl font-bold text-white mb-2">No Health Records Yet</h3>
+                <p className="text-gray-400 mb-4">Start tracking your health by recording your first vital signs</p>
+                <Button onClick={() => setShowForm(true)}>
+                  <span className="mr-2">+</span>
+                  Add First Record
+                </Button>
+              </Card>
+            )}
 
-              {/* Symptoms */}
-              <div>
-                <label className="form-label">Symptoms (comma-separated)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.symptoms}
-                  onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
-                  placeholder="headache, fatigue, dizziness"
-                />
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="form-label">Notes</label>
-                <textarea
-                  className="form-input"
-                  rows={3}
-                  value={formData.notes}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  placeholder="Additional notes about your health today..."
-                />
-              </div>
-
-              <div className="flex space-x-4">
-                <button type="submit" className="btn-primary">
-                  {editingRecord ? 'Update Record' : 'Save Record'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingRecord(null);
-                  }}
-                  className="btn-secondary"
+            {/* Quick Actions */}
+            <Card className="p-6">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                <span className="text-xl mr-3">⚡</span>
+                Quick Actions
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowForm(true)}
+                  className="p-4 h-auto"
                 >
-                  Cancel
-                </button>
+                  <div className="text-center">
+                    <span className="text-2xl block mb-2">➕</span>
+                    <span className="font-medium">Add New Record</span>
+                  </div>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setActiveView('trends')}
+                  className="p-4 h-auto"
+                >
+                  <div className="text-center">
+                    <span className="text-2xl block mb-2">📈</span>
+                    <span className="font-medium">View Trends</span>
+                  </div>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setActiveView('records')}
+                  className="p-4 h-auto"
+                >
+                  <div className="text-center">
+                    <span className="text-2xl block mb-2">📋</span>
+                    <span className="font-medium">All Records</span>
+                  </div>
+                </Button>
               </div>
-            </form>
+            </Card>
           </div>
         )}
 
-        {/* Health Records List */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Health Records History</h2>
-          </div>
-          
-          {healthRecords.length === 0 ? (
-            <div className="text-center py-12">
-              <span className="text-6xl mb-4 block">📊</span>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No health records yet</h3>
-              <p className="text-gray-600 mb-4">Start tracking your health by adding your first record.</p>
-              <button
-                onClick={() => setShowForm(true)}
-                className="btn-primary"
-              >
-                Add First Record
-              </button>
+        {/* Records Tab */}
+        {activeView === 'records' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">Health Records</h2>
+              <Button onClick={() => {
+                setShowForm(true);
+                setEditingRecord(null);
+                setFormData({
+                  date: new Date().toISOString().split('T')[0],
+                  weight: '',
+                  height: '',
+                  systolic: '',
+                  diastolic: '',
+                  heartRate: '',
+                  temperature: '',
+                  bloodSugar: '',
+                  symptoms: '',
+                  notes: ''
+                });
+              }}>
+                <span className="mr-2">+</span>
+                Add Record
+              </Button>
             </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {healthRecords.map((record) => (
-                <div key={record._id} className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center mb-2">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          {formatDate(record.date)}
-                        </h3>
-                        <span className="ml-2 text-sm text-gray-500">
-                          {new Date(record.createdAt).toLocaleTimeString()}
-                        </span>
-                      </div>
 
-                      {/* Vitals Display */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        {record.vitals.weight && (
-                          <div className="bg-blue-50 p-3 rounded">
-                            <span className="block text-sm text-blue-600">Weight</span>
-                            <span className="block font-medium">{record.vitals.weight} kg</span>
-                            {record.vitals.height && (
-                              <span className="block text-xs text-blue-600">
-                                BMI: {calculateBMI(record.vitals.weight, record.vitals.height)}
-                                <span className={`ml-1 ${getBMICategory(parseFloat(calculateBMI(record.vitals.weight, record.vitals.height))).color}`}>
-                                  ({getBMICategory(parseFloat(calculateBMI(record.vitals.weight, record.vitals.height))).category})
-                                </span>
-                              </span>
-                            )}
-                          </div>
-                        )}
-
-                        {record.vitals.bloodPressure && (
-                          <div className="bg-red-50 p-3 rounded">
-                            <span className="block text-sm text-red-600">Blood Pressure</span>
-                            <span className="block font-medium">
-                              {record.vitals.bloodPressure.systolic}/{record.vitals.bloodPressure.diastolic}
-                            </span>
-                          </div>
-                        )}
-
-                        {record.vitals.heartRate && (
-                          <div className="bg-green-50 p-3 rounded">
-                            <span className="block text-sm text-green-600">Heart Rate</span>
-                            <span className="block font-medium">{record.vitals.heartRate} bpm</span>
-                          </div>
-                        )}
-
-                        {record.vitals.temperature && (
-                          <div className="bg-yellow-50 p-3 rounded">
-                            <span className="block text-sm text-yellow-600">Temperature</span>
-                            <span className="block font-medium">{record.vitals.temperature}°F</span>
-                          </div>
-                        )}
-
-                        {record.vitals.bloodSugar && (
-                          <div className="bg-purple-50 p-3 rounded">
-                            <span className="block text-sm text-purple-600">Blood Sugar</span>
-                            <span className="block font-medium">{record.vitals.bloodSugar} mg/dL</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Symptoms */}
-                      {record.symptoms && record.symptoms.length > 0 && (
-                        <div className="mb-2">
-                          <span className="text-sm text-gray-600">Symptoms: </span>
-                          <div className="inline-flex flex-wrap gap-1">
-                            {record.symptoms.map((symptom, index) => (
-                              <span key={index} className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
-                                {symptom}
-                              </span>
-                            ))}
+            {healthRecords.length === 0 ? (
+              <Card className="p-8 text-center">
+                <span className="text-6xl mb-4 block">📋</span>
+                <h3 className="text-xl font-bold text-white mb-2">No Records Found</h3>
+                <p className="text-gray-400 mb-4">Start tracking your health by adding your first record</p>
+                <Button onClick={() => setShowForm(true)}>
+                  Add First Record
+                </Button>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {healthRecords.map((record) => (
+                  <Card key={record._id} className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-4">
+                          <span className="text-2xl mr-3">📊</span>
+                          <div>
+                            <h3 className="text-lg font-semibold text-white">
+                              Health Record - {new Date(record.date).toLocaleDateString()}
+                            </h3>
+                            <p className="text-sm text-gray-400">
+                              Recorded on {new Date(record.createdAt).toLocaleString()}
+                            </p>
                           </div>
                         </div>
-                      )}
 
-                      {/* Notes */}
-                      {record.notes && (
-                        <p className="text-gray-600 text-sm">{record.notes}</p>
-                      )}
+                        {/* Vitals Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
+                          {record.vitals.weight && (
+                            <div className="text-center p-3 bg-blue-50 rounded-lg">
+                              <span className="text-lg block">⚖️</span>
+                              <p className="text-sm text-gray-400">Weight</p>
+                              <p className="font-semibold">{record.vitals.weight} kg</p>
+                            </div>
+                          )}
+                          
+                          {record.vitals.bloodPressure && (
+                            <div className="text-center p-3 bg-red-50 rounded-lg">
+                              <span className="text-lg block">❤️</span>
+                              <p className="text-sm text-gray-400">BP</p>
+                              <p className="font-semibold">
+                                {record.vitals.bloodPressure.systolic}/{record.vitals.bloodPressure.diastolic}
+                              </p>
+                            </div>
+                          )}
+
+                          {record.vitals.heartRate && (
+                            <div className="text-center p-3 bg-green-50 rounded-lg">
+                              <span className="text-lg block">💗</span>
+                              <p className="text-sm text-gray-400">Heart Rate</p>
+                              <p className="font-semibold">{record.vitals.heartRate} bpm</p>
+                            </div>
+                          )}
+
+                          {record.vitals.temperature && (
+                            <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                              <span className="text-lg block">🌡️</span>
+                              <p className="text-sm text-gray-400">Temperature</p>
+                              <p className="font-semibold">{record.vitals.temperature}°C</p>
+                            </div>
+                          )}
+
+                          {record.vitals.bloodSugar && (
+                            <div className="text-center p-3 bg-purple-50 rounded-lg">
+                              <span className="text-lg block">🩸</span>
+                              <p className="text-sm text-gray-400">Blood Sugar</p>
+                              <p className="font-semibold">{record.vitals.bloodSugar} mg/dL</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Symptoms */}
+                        {record.symptoms && record.symptoms.length > 0 && (
+                          <div className="mb-4">
+                            <p className="text-sm font-medium text-gray-400 mb-2">Symptoms:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {record.symptoms.map((symptom, index) => (
+                                <Badge key={index} color="red">
+                                  {symptom}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Notes */}
+                        {record.notes && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-400 mb-1">Notes:</p>
+                            <p className="text-gray-300">{record.notes}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex space-x-2 ml-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(record)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(record._id)}
+                          className="text-red-600 hover:bg-red-50"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Trends Tab */}
+        {activeView === 'trends' && (
+          <Card className="p-8 text-center">
+            <span className="text-6xl mb-4 block">📈</span>
+            <h3 className="text-xl font-bold text-white mb-2">Health Trends</h3>
+            <p className="text-gray-400 mb-4">
+              Advanced analytics and trend visualization coming soon! 
+              Track your health patterns over time with interactive charts.
+            </p>
+            <Button variant="outline" onClick={() => setActiveView('records')}>
+              View Records Instead
+            </Button>
+          </Card>
+        )}
+
+        {/* Add/Edit Form Modal */}
+        {showForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-white mb-4 flex items-center">
+                  <span className="text-2xl mr-3">
+                    {editingRecord ? '✏️' : '➕'}
+                  </span>
+                  {editingRecord ? 'Edit Health Record' : 'Add Health Record'}
+                </h2>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Date
+                    </label>
+                    <Input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({...formData, date: e.target.value})}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Weight (kg)
+                      </label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={formData.weight}
+                        onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                        placeholder="e.g., 70.5"
+                      />
                     </div>
 
-                    <div className="flex space-x-2 ml-4">
-                      <button
-                        onClick={() => handleEdit(record)}
-                        className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(record._id)}
-                        className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                      >
-                        Delete
-                      </button>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Height (cm)
+                      </label>
+                      <Input
+                        type="number"
+                        value={formData.height}
+                        onChange={(e) => setFormData({...formData, height: e.target.value})}
+                        placeholder="e.g., 175"
+                      />
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Health Tips for Tracking */}
-        <div className="mt-8">
-          <h3 className="text-md font-medium text-gray-900 mb-3 px-2">🎯 Health Tracking Tips</h3>
-          <HealthTipsMarquee 
-            variant="compact" 
-            speed="fast"
-            tips={[
-              { icon: '📏', text: 'Measure your vitals at the same time each day for consistency' },
-              { icon: '📊', text: 'Track patterns and trends in your health data over time' },
-              { icon: '🎯', text: 'Set realistic health goals and monitor your progress regularly' },
-              { icon: '📝', text: 'Keep detailed notes about symptoms and how you feel' },
-              { icon: '🔍', text: 'Look for correlations between lifestyle and health metrics' },
-              { icon: '💡', text: 'Share your health data with your healthcare provider' },
-              { icon: '⚡', text: 'Use wearable devices for continuous health monitoring' },
-              { icon: '📱', text: 'Set reminders to track your health data consistently' }
-            ]}
-          />
-        </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Blood Pressure - Systolic
+                      </label>
+                      <Input
+                        type="number"
+                        value={formData.systolic}
+                        onChange={(e) => setFormData({...formData, systolic: e.target.value})}
+                        placeholder="e.g., 120"
+                      />
+                    </div>
 
-        {/* Creator Information */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            Created by{' '}
-            <a href="https://www.linkedin.com/in/shashwat-awasthi18/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium">
-              Shashwat Awasthi
-            </a>
-            {' • '}
-            <a href="https://github.com/shashwat-a18" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium">
-              GitHub
-            </a>
-          </p>
-        </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Blood Pressure - Diastolic
+                      </label>
+                      <Input
+                        type="number"
+                        value={formData.diastolic}
+                        onChange={(e) => setFormData({...formData, diastolic: e.target.value})}
+                        placeholder="e.g., 80"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Heart Rate (bpm)
+                      </label>
+                      <Input
+                        type="number"
+                        value={formData.heartRate}
+                        onChange={(e) => setFormData({...formData, heartRate: e.target.value})}
+                        placeholder="e.g., 72"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Temperature (°C)
+                      </label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={formData.temperature}
+                        onChange={(e) => setFormData({...formData, temperature: e.target.value})}
+                        placeholder="e.g., 36.5"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Blood Sugar (mg/dL)
+                    </label>
+                    <Input
+                      type="number"
+                      value={formData.bloodSugar}
+                      onChange={(e) => setFormData({...formData, bloodSugar: e.target.value})}
+                      placeholder="e.g., 95"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Symptoms (comma-separated)
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.symptoms}
+                      onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
+                      placeholder="e.g., headache, fatigue, dizziness"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Notes
+                    </label>
+                    <textarea
+                      className="w-full px-3 py-2 border border-slate-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      rows={3}
+                      value={formData.notes}
+                      onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                      placeholder="Any additional notes or observations..."
+                    />
+                  </div>
+
+                  <div className="flex space-x-4">
+                    <Button type="submit">
+                      {editingRecord ? 'Update Record' : 'Save Record'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowForm(false);
+                        setEditingRecord(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

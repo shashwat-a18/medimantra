@@ -13,18 +13,16 @@
     "url": "https://github.com/shashwat-a18/medimitra"
   },
   "scripts": {
-    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install && cd ../ml-server && pip install -r requirements.txt",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
     "dev:ml": "cd ml-server && python app.py",
-    "dev:chatbot": "cd chatbot && python simple_chatbot.py",
+    "dev:all": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:ml\"",
     "build:client": "cd client && npm run build",
     "start:client": "cd client && npm start",
     "start:server": "cd server && npm start",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
+    "start": "npm run start:server",
+    "health": "curl -f http://localhost:5000/api/health && curl -f http://localhost:8000/health && curl -f http://localhost:3000/ || echo 'Some services not responding'"
   },
   "keywords": [
     "health",
@@ -44,6 +42,6 @@
     "concurrently": "^8.2.0"
   },
   "dependencies": {
-    "axios": "^1.10.0"
+    "axios": "^1.11.0"
   }
 }

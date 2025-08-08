@@ -1,110 +1,93 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
-import Navigation from '../../components/Navigation';
-import axios from 'axios';
+import Link from 'next/link';
 
 interface Patient {
-  _id: string;
+  id: string;
   name: string;
   email: string;
-  createdAt: string;
-  profile?: {
-    age?: number;
-    gender?: string;
-    phone?: string;
-  };
-  healthData: {
-    recordsCount: number;
-    documentsCount: number;
-    predictionsCount: number;
-    latestRecord?: any;
-    recentPredictions: any[];
-  };
+  age: number;
+  gender: string;
+  phone: string;
+  lastVisit: string;
+  riskLevel: 'low' | 'medium' | 'high';
+  conditions: string[];
 }
 
 interface DoctorStats {
   patients: {
     total: number;
     active: number;
+    highRisk: number;
   };
-  activity: {
-    totalHealthRecords: number;
-    totalPredictions: number;
-    recentHealthRecords: number;
-    recentPredictions: number;
+  appointments: {
+    today: number;
+    thisWeek: number;
+    pending: number;
   };
-  alerts: {
-    highRiskPatients: number;
-    recentHighRiskPredictions: any[];
+  diagnoses: {
+    thisMonth: number;
+    aiAssisted: number;
   };
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
 export default function DoctorDashboard() {
-  const { user, isAuthenticated, loading, token } = useAuth();
+  const { user, isAuthenticated, loading, logout } = useAuth();
   const router = useRouter();
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [stats, setStats] = useState<DoctorStats | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'patients' | 'alerts'>('overview');
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [stats] = useState<DoctorStats>({
+    patients: { total: 87, active: 62, highRisk: 12 },
+    appointments: { today: 8, thisWeek: 23, pending: 5 },
+    diagnoses: { thisMonth: 45, aiAssisted: 23 }
+  });
+
+  const [recentPatients] = useState<Patient[]>([
+    {
+      id: '1',
+      name: 'Priya Sharma',
+      email: 'priya.sharma@email.com',
+      age: 32,
+      gender: 'Female',
+      phone: '+91 98765 43210',
+      lastVisit: '2025-08-06',
+      riskLevel: 'medium',
+      conditions: ['Hypertension', 'Diabetes Type 2']
+    },
+    {
+      id: '2', 
+      name: 'Rajesh Kumar',
+      email: 'rajesh.k@email.com',
+      age: 45,
+      gender: 'Male',
+      phone: '+91 87654 32109',
+      lastVisit: '2025-08-05',
+      riskLevel: 'high',
+      conditions: ['Heart Disease', 'High Cholesterol']
+    },
+    {
+      id: '3',
+      name: 'Ananya Patel',
+      email: 'ananya.patel@email.com', 
+      age: 28,
+      gender: 'Female',
+      phone: '+91 76543 21098',
+      lastVisit: '2025-08-07',
+      riskLevel: 'low',
+      conditions: ['Mild Anxiety']
+    }
+  ]);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login');
-    }
-    if (!loading && isAuthenticated && user?.role !== 'doctor') {
+    if (!loading && (!isAuthenticated || user?.role !== 'doctor')) {
       router.push('/dashboard');
     }
-    if (isAuthenticated && user?.role === 'doctor') {
-      fetchData();
-    }
-  }, [isAuthenticated, loading, user, router]);
+  }, [isAuthenticated, loading, router, user?.role]);
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const [patientsResponse, statsResponse] = await Promise.all([
-        axios.get(`${API_BASE_URL}/doctor/patients`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get(`${API_BASE_URL}/doctor/stats`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      setPatients(patientsResponse.data.patients);
-      setStats(statsResponse.data.stats);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to fetch doctor data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  const getRiskLevel = (predictions: any[]) => {
-    if (predictions.length === 0) return 'Unknown';
-    const latestPrediction = predictions[0];
-    return latestPrediction.result === 1 ? 'High Risk' : 'Low Risk';
-  };
-
-  const getRiskColor = (predictions: any[]) => {
-    if (predictions.length === 0) return 'text-gray-500';
-    const latestPrediction = predictions[0];
-    return latestPrediction.result === 1 ? 'text-red-600' : 'text-green-600';
-  };
-
-  if (loading || isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner"></div>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -113,376 +96,290 @@ export default function DoctorDashboard() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation variant="dashboard" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Doctor Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Monitor patient health data and provide medical insights
-          </p>
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  const doctorMenuItems = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'patients', label: 'My Patients', icon: '👥' },
+    { id: 'appointments', label: 'Appointments', icon: '📅' },
+    { id: 'diagnosis', label: 'AI Diagnosis', icon: '🧠' },
+    { id: 'prescriptions', label: 'Prescriptions', icon: '💊' },
+  ];
+
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case 'high': return 'text-red-400 bg-red-500/10 border-red-500/20';
+      case 'medium': return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20';
+      case 'low': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+      default: return 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+    }
+  };
+
+  const renderOverviewContent = () => (
+    <div className="space-y-6">
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Total Patients</p>
+              <p className="text-3xl font-bold text-white">{stats.patients.total}</p>
+            </div>
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center text-xl">
+              👥
+            </div>
+          </div>
         </div>
 
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Today's Appointments</p>
+              <p className="text-3xl font-bold text-white">{stats.appointments.today}</p>
+            </div>
+            <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center text-xl">
+              📅
+            </div>
           </div>
-        )}
-
-        {/* Tab Navigation */}
-        <div className="mb-8 border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'patients', label: 'Patient Management', icon: '👥' },
-              { id: 'alerts', label: 'Risk Alerts', icon: '⚠️' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
-          </nav>
         </div>
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && stats && (
-          <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">👥</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Total Patients</dt>
-                      <dd className="text-lg font-medium text-gray-900">{stats.patients.total}</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">📊</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Health Records</dt>
-                      <dd className="text-lg font-medium text-gray-900">{stats.activity.totalHealthRecords}</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">🤖</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">AI Predictions</dt>
-                      <dd className="text-lg font-medium text-gray-900">{stats.activity.totalPredictions}</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">⚠️</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">High Risk Patients</dt>
-                      <dd className="text-lg font-medium text-red-600">{stats.alerts.highRiskPatients}</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">AI Diagnoses</p>
+              <p className="text-3xl font-bold text-white">{stats.diagnoses.aiAssisted}</p>
             </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity (Last 7 Days)</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-blue-50 rounded">
-                  <div className="text-2xl font-bold text-blue-600">{stats.activity.recentHealthRecords}</div>
-                  <div className="text-sm text-blue-600">New Health Records</div>
-                </div>
-                <div className="p-4 bg-green-50 rounded">
-                  <div className="text-2xl font-bold text-green-600">{stats.activity.recentPredictions}</div>
-                  <div className="text-sm text-green-600">AI Predictions Made</div>
-                </div>
-              </div>
-            </div>
-
-            {/* High Risk Alerts */}
-            {stats.alerts.recentHighRiskPredictions.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Recent High-Risk Predictions</h3>
-                <div className="space-y-3">
-                  {stats.alerts.recentHighRiskPredictions.slice(0, 5).map((prediction, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded">
-                      <div>
-                        <div className="font-medium text-red-900">
-                          {prediction.userId?.name || 'Unknown Patient'}
-                        </div>
-                        <div className="text-sm text-red-600">
-                          {prediction.predictionType} - High Risk Detected
-                        </div>
-                      </div>
-                      <div className="text-xs text-red-500">
-                        {formatDate(prediction.createdAt)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Patients Tab */}
-        {activeTab === 'patients' && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Patient Management</h2>
-            </div>
-            <div className="overflow-x-auto doctor-scrollbar">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Patient
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Health Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Activity
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Risk Level
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {patients.map((patient) => (
-                    <tr key={patient._id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{patient.name}</div>
-                          <div className="text-sm text-gray-500">{patient.email}</div>
-                          <div className="text-xs text-gray-400">
-                            {patient.profile?.age && `Age: ${patient.profile.age}`}
-                            {patient.profile?.gender && ` • ${patient.profile.gender}`}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {patient.healthData.latestRecord ? (
-                            <div>
-                              <div>Last Record: {formatDate(patient.healthData.latestRecord.date)}</div>
-                              {patient.healthData.latestRecord.vitals?.bloodPressure && (
-                                <div className="text-xs text-gray-500">
-                                  BP: {patient.healthData.latestRecord.vitals.bloodPressure.systolic}/
-                                  {patient.healthData.latestRecord.vitals.bloodPressure.diastolic}
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">No records</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="space-y-1">
-                          <div>📊 {patient.healthData.recordsCount} records</div>
-                          <div>📁 {patient.healthData.documentsCount} documents</div>
-                          <div>🤖 {patient.healthData.predictionsCount} predictions</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`text-sm font-medium ${getRiskColor(patient.healthData.recentPredictions)}`}>
-                          {getRiskLevel(patient.healthData.recentPredictions)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                        <button
-                          onClick={() => setSelectedPatient(patient)}
-                          className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                        >
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-xl">
+              🧠
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Alerts Tab */}
-        {activeTab === 'alerts' && stats && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">High-Risk Patient Alerts</h3>
-              {stats.alerts.recentHighRiskPredictions.length > 0 ? (
-                <div className="space-y-4">
-                  {stats.alerts.recentHighRiskPredictions.map((prediction, index) => (
-                    <div key={index} className="border border-red-200 rounded-lg p-4 bg-red-50">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h4 className="font-medium text-red-900">
-                            {prediction.userId?.name || 'Unknown Patient'}
-                          </h4>
-                          <p className="text-sm text-red-700 mt-1">
-                            High risk detected for {prediction.predictionType}
-                          </p>
-                          <p className="text-xs text-red-600 mt-2">
-                            Prediction made on {formatDate(prediction.createdAt)}
-                          </p>
-                          {prediction.confidence && (
-                            <p className="text-xs text-red-600">
-                              Confidence: {(prediction.confidence * 100).toFixed(1)}%
-                            </p>
-                          )}
-                        </div>
-                        <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">
-                          HIGH RISK
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <span className="text-4xl mb-2 block">✅</span>
-                  <p>No high-risk alerts at this time</p>
-                </div>
-              )}
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">High Risk Patients</p>
+              <p className="text-3xl font-bold text-white">{stats.patients.highRisk}</p>
+            </div>
+            <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex items-center justify-center text-xl">
+              ⚠️
             </div>
           </div>
-        )}
-
-        {/* Patient Details Modal */}
-        {selectedPatient && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 doctor-scrollbar">
-            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Patient Details: {selectedPatient.name}
-                  </h3>
-                  <button
-                    onClick={() => setSelectedPatient(null)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    ✕
-                  </button>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Contact Information</h4>
-                    <p className="text-sm text-gray-600">Email: {selectedPatient.email}</p>
-                    {selectedPatient.profile?.phone && (
-                      <p className="text-sm text-gray-600">Phone: {selectedPatient.profile.phone}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-gray-900">Health Summary</h4>
-                    <div className="grid grid-cols-2 gap-4 mt-2">
-                      <div>
-                        <span className="text-sm text-gray-600">Health Records: </span>
-                        <span className="font-medium">{selectedPatient.healthData.recordsCount}</span>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-600">Documents: </span>
-                        <span className="font-medium">{selectedPatient.healthData.documentsCount}</span>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-600">AI Predictions: </span>
-                        <span className="font-medium">{selectedPatient.healthData.predictionsCount}</span>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-600">Risk Level: </span>
-                        <span className={`font-medium ${getRiskColor(selectedPatient.healthData.recentPredictions)}`}>
-                          {getRiskLevel(selectedPatient.healthData.recentPredictions)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {selectedPatient.healthData.latestRecord && (
-                    <div>
-                      <h4 className="font-medium text-gray-900">Latest Health Record</h4>
-                      <div className="mt-2 p-3 bg-gray-50 rounded">
-                        <p className="text-sm">
-                          Date: {formatDate(selectedPatient.healthData.latestRecord.date)}
-                        </p>
-                        {selectedPatient.healthData.latestRecord.vitals && (
-                          <div className="text-sm text-gray-600 mt-1">
-                            Vitals: 
-                            {selectedPatient.healthData.latestRecord.vitals.bloodPressure && 
-                              ` BP: ${selectedPatient.healthData.latestRecord.vitals.bloodPressure.systolic}/${selectedPatient.healthData.latestRecord.vitals.bloodPressure.diastolic}`}
-                            {selectedPatient.healthData.latestRecord.vitals.heartRate && 
-                              ` • HR: ${selectedPatient.healthData.latestRecord.vitals.heartRate}`}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={() => setSelectedPatient(null)}
-                    className="btn-secondary"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Creator Information */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            Created by{' '}
-            <a href="https://www.linkedin.com/in/shashwat-awasthi18/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium">
-              Shashwat Awasthi
-            </a>
-            {' • '}
-            <a href="https://github.com/shashwat-a18" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium">
-              GitHub
-            </a>
-          </p>
         </div>
       </div>
+
+      {/* Recent Patients */}
+      <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-white mb-4">Recent Patients</h3>
+        <div className="space-y-4">
+          {recentPatients.map((patient) => (
+            <div key={patient.id} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                  {patient.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <p className="text-white font-medium">{patient.name}</p>
+                  <p className="text-gray-400 text-sm">{patient.age} years, {patient.gender}</p>
+                  <p className="text-gray-400 text-xs">Last visit: {patient.lastVisit}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getRiskColor(patient.riskLevel)}`}>
+                  {patient.riskLevel.toUpperCase()} RISK
+                </span>
+                <p className="text-gray-400 text-xs mt-1">{patient.conditions.join(', ')}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-white mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Link href="/appointments" className="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg p-4 text-center transition-colors group">
+            <div className="text-2xl mb-2">📅</div>
+            <p className="text-blue-400 font-medium group-hover:text-blue-300">Schedule Appointment</p>
+          </Link>
+          <button className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg p-4 text-center transition-colors group">
+            <div className="text-2xl mb-2">🧠</div>
+            <p className="text-emerald-400 font-medium group-hover:text-emerald-300">AI Diagnosis</p>
+          </button>
+          <button className="bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 rounded-lg p-4 text-center transition-colors group">
+            <div className="text-2xl mb-2">💊</div>
+            <p className="text-purple-400 font-medium group-hover:text-purple-300">Write Prescription</p>
+          </button>
+          <button className="bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-lg p-4 text-center transition-colors group">
+            <div className="text-2xl mb-2">📊</div>
+            <p className="text-orange-400 font-medium group-hover:text-orange-300">Patient Reports</p>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return renderOverviewContent();
+      case 'patients':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">My Patients</h3>
+            <div className="space-y-4">
+              {recentPatients.map((patient) => (
+                <div key={patient.id} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                      {patient.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{patient.name}</p>
+                      <p className="text-gray-400 text-sm">{patient.email}</p>
+                      <p className="text-gray-400 text-xs">{patient.phone}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getRiskColor(patient.riskLevel)}`}>
+                      {patient.riskLevel.toUpperCase()} RISK
+                    </span>
+                    <p className="text-gray-400 text-xs mt-1">{patient.conditions.join(', ')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case 'appointments':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Today's Appointments</h3>
+            <p className="text-gray-400">You have {stats.appointments.today} appointments scheduled for today.</p>
+            <Link href="/appointments" className="text-blue-400 hover:text-blue-300 mt-2 inline-block">
+              View all appointments →
+            </Link>
+          </div>
+        );
+      case 'diagnosis':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">AI-Assisted Diagnosis</h3>
+            <p className="text-gray-400">Use AI tools to assist with patient diagnosis and treatment planning.</p>
+            <div className="mt-4 space-y-2">
+              <button className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-4 py-2 rounded-lg border border-purple-500/20 transition-colors">
+                Start AI Analysis
+              </button>
+              <button className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg border border-blue-500/20 transition-colors ml-2">
+                View Past Analyses
+              </button>
+            </div>
+          </div>
+        );
+      case 'prescriptions':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Prescription Management</h3>
+            <p className="text-gray-400">Create and manage patient prescriptions.</p>
+            <div className="mt-4 space-y-2">
+              <button className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg border border-emerald-500/20 transition-colors">
+                New Prescription
+              </button>
+              <button className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg border border-blue-500/20 transition-colors ml-2">
+                View History
+              </button>
+            </div>
+          </div>
+        );
+      default:
+        return renderOverviewContent();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900">
+      {/* Top Navigation */}
+      <nav className="bg-slate-800/50 backdrop-blur-xl border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">M</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">MediMitra</h1>
+                  <p className="text-xs text-gray-400">Doctor Portal</p>
+                </div>
+              </Link>
+            </div>
+
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-white font-medium">Dr. {user.name}</p>
+                <p className="text-xs text-gray-400">{user.email}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-4 py-2 rounded-lg transition-colors duration-200 border border-red-500/20"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Doctor Tab Navigation */}
+        <div className="border-t border-slate-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex space-x-8 overflow-x-auto">
+              {doctorMenuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center space-x-2 py-4 px-2 border-b-2 transition-colors duration-200 whitespace-nowrap ${
+                    activeTab === item.id
+                      ? 'border-blue-500 text-blue-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-300'
+                  }`}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span className="font-medium">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Doctor Welcome Section */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-br from-emerald-600 via-blue-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold mb-2">
+                  Welcome, Dr. {user.name} 👨‍⚕️
+                </h1>
+                <p className="text-blue-100">
+                  Manage your patients, appointments, and provide AI-assisted healthcare
+                </p>
+              </div>
+              <div className="text-6xl opacity-20">🩺</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Content */}
+        {renderTabContent()}
+      </main>
     </div>
   );
 }

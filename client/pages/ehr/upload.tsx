@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
-import Navigation from '../../components/Navigation';
+import DashboardLayout from '../../components/DashboardLayout';
 import axios from 'axios';
 
 interface UploadedDocument {
@@ -174,8 +174,8 @@ export default function DocumentUpload() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner"></div>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -185,19 +185,17 @@ export default function DocumentUpload() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation variant="dashboard" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Document Upload</h1>
-          <p className="text-gray-600 mt-2">
-            Upload and manage your medical documents securely
-          </p>
-        </div>
+    <DashboardLayout>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-white">Document Upload</h1>
+        <p className="text-slate-300 mt-2">
+          Upload and manage your medical documents securely
+        </p>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Upload Section */}
-          <div className="bg-white rounded-lg shadow p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Upload Section */}
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Upload Medical Documents</h2>
             
             {/* Drop Zone */}
@@ -205,7 +203,7 @@ export default function DocumentUpload() {
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                 dragActive 
                   ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-300 hover:border-gray-400'
+                  : 'border-slate-500 hover:border-gray-400'
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -217,10 +215,10 @@ export default function DocumentUpload() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-white mb-2">
                 {dragActive ? 'Drop files here' : 'Drag and drop files here'}
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-400 mb-4">
                 or click to browse files
               </p>
               <button
@@ -246,7 +244,7 @@ export default function DocumentUpload() {
                 <h3 className="text-lg font-semibold mb-4">Selected Files</h3>
                 <div className="space-y-2">
                   {selectedFiles.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-800/30 rounded">
                       <div className="flex items-center space-x-3">
                         <span className="text-2xl">
                           {file.type === 'application/pdf' ? '📄' : '🖼️'}
@@ -301,15 +299,15 @@ export default function DocumentUpload() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">📄</span>
-                  <span className="text-gray-700">PDF Documents</span>
+                  <span className="text-gray-300">PDF Documents</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">🖼️</span>
-                  <span className="text-gray-700">Images (JPG, PNG)</span>
+                  <span className="text-gray-300">Images (JPG, PNG)</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">📊</span>
-                  <span className="text-gray-700">Lab Reports</span>
+                  <span className="text-gray-300">Lab Reports</span>
                 </div>
               </div>
               <p className="text-sm text-gray-500 mt-2">Maximum file size: 10MB per file</p>
@@ -317,7 +315,7 @@ export default function DocumentUpload() {
           </div>
 
           {/* Documents List */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Your Documents</h2>
             
             {uploadedDocuments.length > 0 ? (
@@ -355,9 +353,9 @@ export default function DocumentUpload() {
                     </div>
                     
                     {doc.ocrText && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded">
+                      <div className="mt-3 p-3 bg-slate-800/30 rounded">
                         <h4 className="text-sm font-medium mb-1">Extracted Text:</h4>
-                        <p className="text-sm text-gray-700 truncate">{doc.ocrText.substring(0, 200)}...</p>
+                        <p className="text-sm text-gray-300 truncate">{doc.ocrText.substring(0, 200)}...</p>
                       </div>
                     )}
                   </div>
@@ -388,7 +386,6 @@ export default function DocumentUpload() {
             </a>
           </p>
         </div>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 }

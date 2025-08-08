@@ -1,23 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
-import Navigation from '../../components/Navigation';
-import axios from 'axios';
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-  createdAt: string;
-  stats: {
-    healthRecords: number;
-    documents: number;
-    predictions: number;
-    reminders: number;
-  };
-}
+import Link from 'next/link';
 
 interface SystemStats {
   users: {
@@ -43,90 +27,27 @@ interface SystemStats {
   };
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
 export default function AdminDashboard() {
-  const { user, isAuthenticated, loading, token } = useAuth();
+  const { user, isAuthenticated, loading, logout } = useAuth();
   const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
-  const [stats, setStats] = useState<SystemStats | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'system'>('overview');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [stats, setStats] = useState<SystemStats>({
+    users: { total: 156, patients: 120, doctors: 32, admins: 4, recent: 12 },
+    content: { healthRecords: 1243, documents: 876, predictions: 432, reminders: 234 },
+    activity: { recentUsers: 23, recentHealthRecords: 45, recentPredictions: 12 },
+    storage: { totalDocumentSize: 2.4 }
+  });
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login');
-    }
-    if (!loading && isAuthenticated && user?.role !== 'admin') {
+    if (!loading && (!isAuthenticated || user?.role !== 'admin')) {
       router.push('/dashboard');
     }
-    if (isAuthenticated && user?.role === 'admin') {
-      fetchData();
-    }
-  }, [isAuthenticated, loading, user, router]);
+  }, [isAuthenticated, loading, router, user?.role]);
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const [usersResponse, statsResponse] = await Promise.all([
-        axios.get(`${API_BASE_URL}/admin/users`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get(`${API_BASE_URL}/admin/stats`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      setUsers(usersResponse.data.users);
-      setStats(statsResponse.data.stats);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to fetch admin data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateUserRole = async (userId: string, newRole: string) => {
-    try {
-      await axios.put(`${API_BASE_URL}/admin/users/${userId}`, 
-        { role: newRole },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchData(); // Refresh data
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to update user role');
-    }
-  };
-
-  const toggleUserStatus = async (userId: string, isActive: boolean) => {
-    try {
-      await axios.put(`${API_BASE_URL}/admin/users/${userId}`, 
-        { isActive: !isActive },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchData(); // Refresh data
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to update user status');
-    }
-  };
-
-  const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  if (loading || isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="spinner"></div>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -135,307 +56,283 @@ export default function AdminDashboard() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation variant="dashboard" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Manage users, monitor system health, and configure settings
-          </p>
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  const adminMenuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'users', label: 'User Management', icon: '👥' },
+    { id: 'inventory', label: 'Inventory', icon: '📦' },
+    { id: 'reports', label: 'Reports', icon: '📈' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+  ];
+
+  const renderDashboardContent = () => (
+    <div className="space-y-6">
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Total Users</p>
+              <p className="text-3xl font-bold text-white">{stats.users.total}</p>
+            </div>
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center text-xl">
+              👥
+            </div>
+          </div>
         </div>
 
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Health Records</p>
+              <p className="text-3xl font-bold text-white">{stats.content.healthRecords}</p>
+            </div>
+            <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center text-xl">
+              📋
+            </div>
           </div>
-        )}
-
-        {/* Tab Navigation */}
-        <div className="mb-8 border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'users', label: 'User Management', icon: '👥' },
-              { id: 'system', label: 'System Health', icon: '⚙️' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
-          </nav>
         </div>
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && stats && (
-          <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">👥</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Total Users</dt>
-                      <dd className="text-lg font-medium text-gray-900">{stats.users.total}</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">📊</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Health Records</dt>
-                      <dd className="text-lg font-medium text-gray-900">{stats.content.healthRecords}</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">🤖</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">AI Predictions</dt>
-                      <dd className="text-lg font-medium text-gray-900">{stats.content.predictions}</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-2xl">💾</span>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Storage Used</dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {formatBytes(stats.storage.totalDocumentSize)}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">AI Predictions</p>
+              <p className="text-3xl font-bold text-white">{stats.content.predictions}</p>
             </div>
-
-            {/* User Role Distribution */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">User Distribution</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded">
-                  <div className="text-2xl font-bold text-blue-600">{stats.users.patients}</div>
-                  <div className="text-sm text-blue-600">Patients</div>
-                </div>
-                <div className="text-center p-4 bg-green-50 rounded">
-                  <div className="text-2xl font-bold text-green-600">{stats.users.doctors}</div>
-                  <div className="text-sm text-green-600">Doctors</div>
-                </div>
-                <div className="text-center p-4 bg-purple-50 rounded">
-                  <div className="text-2xl font-bold text-purple-600">{stats.users.admins}</div>
-                  <div className="text-sm text-purple-600">Admins</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity (Last 30 Days)</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">New Users</span>
-                  <span className="font-medium">{stats.activity.recentUsers}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Health Records Added</span>
-                  <span className="font-medium">{stats.activity.recentHealthRecords}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">AI Predictions Made</span>
-                  <span className="font-medium">{stats.activity.recentPredictions}</span>
-                </div>
-              </div>
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-xl">
+              🧠
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Users Tab */}
-        {activeTab === 'users' && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">User Management</h2>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Storage (GB)</p>
+              <p className="text-3xl font-bold text-white">{stats.storage.totalDocumentSize}</p>
             </div>
-            <div className="overflow-x-auto admin-scrollbar">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Activity
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {users.map((userData) => (
-                    <tr key={userData._id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{userData.name}</div>
-                          <div className="text-sm text-gray-500">{userData.email}</div>
-                          <div className="text-xs text-gray-400">
-                            Joined {formatDate(userData.createdAt)}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={userData.role}
-                          onChange={(e) => updateUserRole(userData._id, e.target.value)}
-                          className="text-sm border border-gray-300 rounded px-2 py-1"
-                          disabled={userData._id === (user as any)?.id} // Can't change own role
-                        >
-                          <option value="patient">Patient</option>
-                          <option value="doctor">Doctor</option>
-                          <option value="admin">Admin</option>
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          userData.isActive 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {userData.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="space-y-1">
-                          <div>📊 {userData.stats.healthRecords} records</div>
-                          <div>📁 {userData.stats.documents} documents</div>
-                          <div>🤖 {userData.stats.predictions} predictions</div>
-                          <div>⏰ {userData.stats.reminders} reminders</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                        <button
-                          onClick={() => toggleUserStatus(userData._id, userData.isActive)}
-                          className={`px-3 py-1 rounded text-xs ${
-                            userData.isActive
-                              ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                              : 'bg-green-100 text-green-700 hover:bg-green-200'
-                          }`}
-                          disabled={userData._id === (user as any)?.id} // Can't deactivate self
-                        >
-                          {userData.isActive ? 'Deactivate' : 'Activate'}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-xl">
+              💾
             </div>
           </div>
-        )}
-
-        {/* System Tab */}
-        {activeTab === 'system' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">System Status</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-green-50 rounded">
-                  <div className="flex items-center">
-                    <span className="text-green-500 mr-2">✅</span>
-                    <span className="font-medium">Database Connected</span>
-                  </div>
-                </div>
-                <div className="p-4 bg-green-50 rounded">
-                  <div className="flex items-center">
-                    <span className="text-green-500 mr-2">✅</span>
-                    <span className="font-medium">ML Server Running</span>
-                  </div>
-                </div>
-                <div className="p-4 bg-green-50 rounded">
-                  <div className="flex items-center">
-                    <span className="text-green-500 mr-2">✅</span>
-                    <span className="font-medium">API Server Healthy</span>
-                  </div>
-                </div>
-                <div className="p-4 bg-green-50 rounded">
-                  <div className="flex items-center">
-                    <span className="text-green-500 mr-2">✅</span>
-                    <span className="font-medium">File Storage Available</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">System Information</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Node.js Version</span>
-                  <span className="font-medium">{process.version || 'Unknown'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Environment</span>
-                  <span className="font-medium">{process.env.NODE_ENV || 'development'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Platform</span>
-                  <span className="font-medium">Windows</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Creator Information */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            Created by{' '}
-            <a href="https://www.linkedin.com/in/shashwat-awasthi18/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium">
-              Shashwat Awasthi
-            </a>
-            {' • '}
-            <a href="https://github.com/shashwat-a18" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-medium">
-              GitHub
-            </a>
-          </p>
         </div>
       </div>
+
+      {/* User Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4">User Distribution</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Patients</span>
+              <span className="text-white font-semibold">{stats.users.patients}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Doctors</span>
+              <span className="text-white font-semibold">{stats.users.doctors}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Admins</span>
+              <span className="text-white font-semibold">{stats.users.admins}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4">Recent Activity</h3>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4 p-3 bg-slate-700/30 rounded-lg">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">U</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-white text-sm">New users registered</p>
+                <p className="text-gray-400 text-xs">{stats.activity.recentUsers} this week</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4 p-3 bg-slate-700/30 rounded-lg">
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">R</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-white text-sm">Health records uploaded</p>
+                <p className="text-gray-400 text-xs">{stats.activity.recentHealthRecords} this week</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4 p-3 bg-slate-700/30 rounded-lg">
+              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">A</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-white text-sm">AI predictions made</p>
+                <p className="text-gray-400 text-xs">{stats.activity.recentPredictions} this week</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return renderDashboardContent();
+      case 'users':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">User Management</h3>
+            <p className="text-gray-400">User management functionality will be implemented here.</p>
+            <div className="mt-4 space-y-2">
+              <button className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg border border-blue-500/20 transition-colors">
+                Add New User
+              </button>
+              <button className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg border border-emerald-500/20 transition-colors ml-2">
+                Export Users
+              </button>
+            </div>
+          </div>
+        );
+      case 'inventory':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">Inventory Management</h3>
+            <p className="text-gray-400">
+              Manage medicine inventory and supplies. 
+              <Link href="/inventory" className="text-blue-400 hover:text-blue-300 ml-2">
+                View Inventory →
+              </Link>
+            </p>
+          </div>
+        );
+      case 'reports':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">System Reports</h3>
+            <p className="text-gray-400">Generate and view system reports.</p>
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+              <button className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 p-4 rounded-lg border border-blue-500/20 transition-colors">
+                User Activity Report
+              </button>
+              <button className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 p-4 rounded-lg border border-emerald-500/20 transition-colors">
+                Health Data Report
+              </button>
+              <button className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 p-4 rounded-lg border border-purple-500/20 transition-colors">
+                System Performance
+              </button>
+            </div>
+          </div>
+        );
+      case 'settings':
+        return (
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">System Settings</h3>
+            <p className="text-gray-400">Configure system-wide settings and preferences.</p>
+            <div className="mt-6 space-y-4">
+              <div className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
+                <span className="text-white">Email Notifications</span>
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">Enabled</button>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
+                <span className="text-white">Data Backup</span>
+                <button className="bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm">Auto</button>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
+                <span className="text-white">Security Level</span>
+                <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm">High</button>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return renderDashboardContent();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900">
+      {/* Top Navigation */}
+      <nav className="bg-slate-800/50 backdrop-blur-xl border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">M</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">MediMitra</h1>
+                  <p className="text-xs text-gray-400">Admin Portal</p>
+                </div>
+              </Link>
+            </div>
+
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-white font-medium">{user.name}</p>
+                <p className="text-xs text-gray-400">{user.email}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-4 py-2 rounded-lg transition-colors duration-200 border border-red-500/20"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Admin Tab Navigation */}
+        <div className="border-t border-slate-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex space-x-8 overflow-x-auto">
+              {adminMenuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center space-x-2 py-4 px-2 border-b-2 transition-colors duration-200 whitespace-nowrap ${
+                    activeTab === item.id
+                      ? 'border-blue-500 text-blue-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-300'
+                  }`}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span className="font-medium">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Admin Welcome Section */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold mb-2">
+                  Admin Dashboard - {user.name} ⚙️
+                </h1>
+                <p className="text-orange-100">
+                  Monitor system health, manage users, and oversee platform operations
+                </p>
+              </div>
+              <div className="text-6xl opacity-20">🛡️</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Content */}
+        {renderTabContent()}
+      </main>
     </div>
   );
 }

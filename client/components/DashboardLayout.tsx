@@ -1,29 +1,15 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
-import Sidebar from './Sidebar';
-import Navigation from './Navigation';
+import Link from 'next/link';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const router = useRouter();
-
-  // Check if current page should use dashboard layout
-  const dashboardPages = [
-    '/dashboard',
-    '/health/tracking',
-    '/health/predict',
-    '/appointments',
-    '/reminders',
-    '/ehr/upload',
-    '/chatbot',
-    '/admin',
-    '/doctor'
-  ];
 
   // Pages that have their own navigation and don't need the Navigation component
   const pagesWithOwnNavigation = [
@@ -32,10 +18,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     '/register'
   ];
 
-  const isDashboardPage = dashboardPages.some(page => 
-    router.pathname.startsWith(page)
-  );
-
   const hasOwnNavigation = pagesWithOwnNavigation.includes(router.pathname);
 
   // For pages with their own navigation (landing, login, register), just render children
@@ -43,55 +25,99 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return <main>{children}</main>;
   }
 
-  // For authenticated dashboard pages, use full dashboard layout
-  if (isAuthenticated && isDashboardPage) {
-    // Continue to dashboard layout below
-  } else {
-    // For other authenticated pages or pages that need navigation
-    return (
-      <>
-        <Navigation variant="default" />
-        <main>{children}</main>
-      </>
-    );
-  }
-
+  // For other pages, use simplified layout without sidebar
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden transition-all duration-300 ml-16 lg:ml-64">
-        {/* Top Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="px-6 py-4">
-            <h1 className="text-2xl font-semibold text-gray-800">
-              {getPageTitle(router.pathname)}
-            </h1>
+    <div className="min-h-screen bg-slate-900">
+      {/* Top Navigation */}
+      <nav className="bg-slate-800 border-b border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="text-2xl font-bold text-white hover:text-blue-400">
+                MediMitra
+              </Link>
+              <div className="hidden md:block">
+                <div className="ml-4 flex items-baseline space-x-4">
+                  {user?.role === 'admin' && (
+                    <>
+                      <Link href="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Dashboard
+                      </Link>
+                      <Link href="/admin/users" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Users
+                      </Link>
+                      <Link href="/admin/inventory" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Inventory
+                      </Link>
+                      <Link href="/admin/reports" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Reports
+                      </Link>
+                      <Link href="/admin/chatbot" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        AI Assistant
+                      </Link>
+                    </>
+                  )}
+                  {user?.role === 'doctor' && (
+                    <>
+                      <Link href="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Dashboard
+                      </Link>
+                      <Link href="/doctor/patients" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Patients
+                      </Link>
+                      <Link href="/doctor/appointments" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Appointments
+                      </Link>
+                      <Link href="/chatbot" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        AI Assistant
+                      </Link>
+                    </>
+                  )}
+                  {user?.role === 'patient' && (
+                    <>
+                      <Link href="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Dashboard
+                      </Link>
+                      <Link href="/appointments" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Appointments
+                      </Link>
+                      <Link href="/orders" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Orders
+                      </Link>
+                      <Link href="/reminders" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Reminders
+                      </Link>
+                      <Link href="/chatbot" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        AI Assistant
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-300 text-sm">
+                Welcome, {user?.name}
+              </span>
+              <button
+                onClick={() => {
+                  logout();
+                  router.push('/');
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           </div>
-        </header>
-        
-        {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">
-          {children}
-        </main>
-      </div>
+        </div>
+      </nav>
+      
+      {/* Page Content */}
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {children}
+      </main>
     </div>
   );
-}
-
-function getPageTitle(pathname: string): string {
-  const titles: { [key: string]: string } = {
-    '/dashboard': 'Dashboard',
-    '/health/tracking': 'Health Tracking',
-    '/health/predict': 'AI Predictions',
-    '/appointments': 'My Appointments',
-    '/reminders': 'Reminders',
-    '/ehr/upload': 'Documents',
-    '/chatbot': 'AI Assistant',
-    '/admin': 'Admin Panel',
-    '/doctor': 'Doctor Portal'
-  };
-
-  return titles[pathname] || 'MediMitra';
 }

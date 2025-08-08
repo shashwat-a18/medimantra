@@ -1,744 +1,690 @@
+/* Tailwind CSS - Modern Healthcare Application Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
+/* Medical Theme CSS Variables */
+:root {
+  /* Primary Brand Colors - Medical Blue */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
+  
+  /* Secondary Colors - Medical Green */
+  --secondary-50: #ecfdf5;
+  --secondary-100: #d1fae5;
+  --secondary-200: #a7f3d0;
+  --secondary-300: #6ee7b7;
+  --secondary-400: #34d399;
+  --secondary-500: #10b981;
+  --secondary-600: #059669;
+  --secondary-700: #047857;
+  --secondary-800: #065f46;
+  --secondary-900: #064e3b;
+  
+  /* Accent Colors - Tech & Medical */
+  --accent-cyan: #06b6d4;
+  --accent-purple: #8b5cf6;
+  --accent-pink: #ec4899;
+  --accent-orange: #f97316;
+  --accent-yellow: #eab308;
+  
+  /* Status Colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* Modern Dark Theme */
+  --bg-primary: #0f172a;        /* slate-900 - Main background */
+  --bg-secondary: #1e293b;      /* slate-800 - Secondary areas */
+  --bg-tertiary: #334155;       /* slate-700 - Cards, modals */
+  --bg-elevated: #475569;       /* slate-600 - Elevated elements */
+  --bg-overlay: rgba(15, 23, 42, 0.8); /* Dark overlay */
+  
+  /* Border Colors */
+  --border-primary: #334155;    /* slate-700 - Main borders */
+  --border-secondary: #475569;  /* slate-600 - Secondary borders */
+  --border-accent: #3b82f6;     /* Blue accent borders */
+  
+  /* Text Colors */
+  --text-primary: #f8fafc;      /* slate-50 - Primary text */
+  --text-secondary: #e2e8f0;    /* slate-200 - Secondary text */
+  --text-muted: #94a3b8;        /* slate-400 - Muted text */
+  --text-accent: #60a5fa;       /* blue-400 - Accent text */
+  --text-success: #34d399;      /* emerald-400 - Success text */
+  --text-warning: #fbbf24;      /* amber-400 - Warning text */
+  --text-error: #f87171;        /* red-400 - Error text */
+  
+  /* Modern Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.5);
+  --shadow-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.5);
+}
+
+/* Global Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Apply tech scrollbar globally */
-  overflow-y: auto;
+  font-weight: 400;
 }
 
-/* Apply tech scrollbar to html as well */
-html {
-  overflow-y: auto;
-}
-
-/* Custom component styles */
-.btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
-}
-
-.btn-secondary {
-  @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
-}
-
-.card {
-  @apply bg-white rounded-lg shadow-md border border-gray-200;
-}
-
-.form-input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
-}
-
-.form-label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
-}
-
-/* Loading spinner */
-.spinner {
-  @apply inline-block w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin;
-}
-
-/* Health status indicators */
-.risk-low {
-  @apply bg-green-100 text-green-800 border-green-200;
-}
-
-.risk-medium {
-  @apply bg-yellow-100 text-yellow-800 border-yellow-200;
-}
-
-.risk-high {
-  @apply bg-red-100 text-red-800 border-red-200;
-}
-
-/* Dashboard grid */
-.dashboard-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-}
-
-/* Responsive table */
-.table-responsive {
-  @apply overflow-x-auto;
-}
-
-.table {
-  @apply w-full text-sm text-left text-gray-500;
-}
-
-.table thead {
-  @apply text-xs text-gray-700 uppercase bg-gray-50;
-}
-
-.table th {
-  @apply px-6 py-3;
-}
-
-.table td {
-  @apply px-6 py-4 whitespace-nowrap;
-}
-
-/* Chat interface */
-.chat-container {
-  @apply flex flex-col h-96 bg-gray-50 rounded-lg border;
-}
-
-.chat-messages {
-  @apply flex-1 overflow-y-auto p-4 space-y-2;
-}
-
-.chat-input {
-  @apply border-t bg-white p-4;
-}
-
-/* Custom scrollbar styles for sidebar */
-.sidebar-nav::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar-nav::-webkit-scrollbar-track {
-  background: rgba(59, 130, 246, 0.1);
-  border-radius: 3px;
-}
-
-.sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-
-.sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-/* Firefox scrollbar */
-.sidebar-nav {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(59, 130, 246, 0.1);
-}
-
-.message-user {
-  @apply bg-blue-600 text-white p-3 rounded-lg ml-auto max-w-xs;
-}
-
-.message-bot {
-  @apply bg-white border p-3 rounded-lg mr-auto max-w-xs;
-}
-
-/* Modern Tech-Savvy Scrollbar */
-/* Webkit browsers (Chrome, Safari, Edge) */
+/* Modern Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-  border-radius: 10px;
-  box-shadow: inset 0 0 2px rgba(0, 255, 255, 0.1);
+  background: var(--bg-secondary);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00d4ff 0%, #0099cc 50%, #006699 100%);
-  border-radius: 10px;
-  box-shadow: 
-    0 0 8px rgba(0, 212, 255, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(0, 212, 255, 0.3);
+  background: linear-gradient(135deg, #3b82f6, #10b981);
+  border-radius: 4px;
   transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #00ffff 0%, #00ccff 50%, #0099ff 100%);
-  box-shadow: 
-    0 0 12px rgba(0, 255, 255, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #2563eb, #059669);
 }
 
-::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(180deg, #ffffff 0%, #00ffff 50%, #0099ff 100%);
-  box-shadow: 
-    0 0 16px rgba(0, 255, 255, 0.8),
-    inset 0 2px 4px rgba(255, 255, 255, 0.4);
+/* Selection Colors */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--text-primary);
 }
 
-::-webkit-scrollbar-corner {
-  background: #0f172a;
+::-moz-selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--text-primary);
 }
 
-/* Firefox scrollbar styling */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #00d4ff #1e293b;
+/* Modern Button Styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-blue-600 to-emerald-600;
+  @apply hover:from-blue-700 hover:to-emerald-700;
+  @apply text-white font-semibold rounded-lg;
+  @apply shadow-lg hover:shadow-xl;
+  @apply transform hover:scale-105 active:scale-95;
+  @apply transition-all duration-300;
+  @apply focus:outline-none focus:ring-4 focus:ring-blue-500/25;
 }
 
-/* Enhanced scrollbar for specific containers */
-.chat-messages::-webkit-scrollbar-thumb,
-.table-responsive::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #00d4ff 0%, #ff00ff 50%, #00d4ff 100%);
-  animation: glow 2s ease-in-out infinite alternate;
+.btn-secondary {
+  @apply bg-slate-700 hover:bg-slate-600;
+  @apply text-white font-semibold rounded-lg;
+  @apply shadow-md hover:shadow-lg;
+  @apply transform hover:scale-105 active:scale-95;
+  @apply transition-all duration-300;
+  @apply focus:outline-none focus:ring-4 focus:ring-slate-500/25;
 }
 
-@keyframes glow {
+.btn-outline {
+  @apply bg-transparent border-2 border-blue-500;
+  @apply text-blue-400 hover:text-white;
+  @apply hover:bg-blue-500 font-semibold rounded-lg;
+  @apply shadow-md hover:shadow-lg;
+  @apply transform hover:scale-105 active:scale-95;
+  @apply transition-all duration-300;
+  @apply focus:outline-none focus:ring-4 focus:ring-blue-500/25;
+}
+
+/* Modern Card Styles */
+.card-modern {
+  @apply bg-slate-800/50 backdrop-blur-sm;
+  @apply border border-slate-700;
+  @apply rounded-2xl shadow-xl;
+  @apply hover:border-slate-600 hover:shadow-2xl;
+  @apply transition-all duration-300;
+}
+
+.card-glass {
+  @apply bg-white/5 backdrop-blur-xl;
+  @apply border border-white/10;
+  @apply rounded-2xl shadow-xl;
+  @apply hover:bg-white/10 hover:border-white/20;
+  @apply transition-all duration-300;
+}
+
+/* Modern Input Styles */
+.input-modern {
+  @apply bg-slate-800/50 backdrop-blur-sm;
+  @apply border border-slate-600;
+  @apply text-white placeholder-slate-400;
+  @apply rounded-lg px-4 py-3;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50;
+  @apply focus:border-blue-500;
+  @apply transition-all duration-300;
+}
+
+/* Animation Classes */
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.8s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
   from {
-    box-shadow: 
-      0 0 8px rgba(0, 212, 255, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
-    box-shadow: 
-      0 0 16px rgba(0, 212, 255, 0.8),
-      0 0 24px rgba(255, 0, 255, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-}
-
-/* Dark theme scrollbar variants */
-.dark ::-webkit-scrollbar-track {
-  background: linear-gradient(180deg, #000000 0%, #111827 50%, #000000 100%);
-  box-shadow: inset 0 0 3px rgba(0, 255, 255, 0.2);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00ff41 0%, #00cc33 50%, #009922 100%);
-  box-shadow: 
-    0 0 10px rgba(0, 255, 65, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(0, 255, 65, 0.4);
-}
-
-/* Admin dashboard specific styling */
-.admin-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ff0080 0%, #cc0066 50%, #990044 100%);
-  box-shadow: 
-    0 0 8px rgba(255, 0, 128, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-/* Doctor dashboard specific styling */
-.doctor-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00ff80 0%, #00cc66 50%, #009944 100%);
-  box-shadow: 
-    0 0 8px rgba(0, 255, 128, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-/* Health Tips Running Marquee */
-.health-tips-marquee {
-  overflow: hidden;
-  white-space: nowrap;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 16px 0;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-  height: 80px;
-  display: flex;
-  align-items: center;
-}
-
-.health-tips-marquee::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    rgba(102, 126, 234, 0.9) 0%, 
-    rgba(102, 126, 234, 0.1) 20%, 
-    rgba(102, 126, 234, 0.1) 80%, 
-    rgba(102, 126, 234, 0.9) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.health-tips-content {
-  display: flex;
-  width: max-content;
-  animation: step-scroll 50s infinite;
-  position: relative;
-  z-index: 0;
-}
-
-.health-tip-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  margin: 0 20px;
-  padding: 12px 24px;
-  border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-width: 400px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.health-tip-item:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.health-tip-icon {
-  font-size: 20px;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-
-.health-tip-text {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 14px;
-  text-align: center;
-}
-
-/* Step-by-step animation with pauses */
-@keyframes step-scroll {
-  0% { transform: translateX(100%); }
-  8% { transform: translateX(calc(50% - 200px)); }
-  15% { transform: translateX(calc(50% - 200px)); }
-  23% { transform: translateX(-100%); }
-  25% { transform: translateX(100%); }
-  
-  25% { transform: translateX(100%); }
-  33% { transform: translateX(calc(50% - 200px)); }
-  40% { transform: translateX(calc(50% - 200px)); }
-  48% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-  
-  50% { transform: translateX(100%); }
-  58% { transform: translateX(calc(50% - 200px)); }
-  65% { transform: translateX(calc(50% - 200px)); }
-  73% { transform: translateX(-100%); }
-  75% { transform: translateX(100%); }
-  
-  75% { transform: translateX(100%); }
-  83% { transform: translateX(calc(50% - 200px)); }
-  90% { transform: translateX(calc(50% - 200px)); }
-  98% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Pause animation on hover */
-.health-tips-marquee:hover .health-tips-content {
-  animation-play-state: paused;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .health-tips-marquee {
-    height: 70px;
-  }
-  
-  .health-tip-item {
-    margin: 0 15px;
-    padding: 10px 20px;
-    min-width: 300px;
-  }
-  
-  .health-tip-text {
-    font-size: 13px;
-  }
-  
-  .health-tip-icon {
-    font-size: 18px;
-    margin-right: 10px;
-  }
-  
-  @keyframes step-scroll {
-    0% { transform: translateX(100%); }
-    8% { transform: translateX(calc(50% - 150px)); }
-    15% { transform: translateX(calc(50% - 150px)); }
-    23% { transform: translateX(-100%); }
-    25% { transform: translateX(100%); }
-    
-    25% { transform: translateX(100%); }
-    33% { transform: translateX(calc(50% - 150px)); }
-    40% { transform: translateX(calc(50% - 150px)); }
-    48% { transform: translateX(-100%); }
-    50% { transform: translateX(100%); }
-    
-    50% { transform: translateX(100%); }
-    58% { transform: translateX(calc(50% - 150px)); }
-    65% { transform: translateX(calc(50% - 150px)); }
-    73% { transform: translateX(-100%); }
-    75% { transform: translateX(100%); }
-    
-    75% { transform: translateX(100%); }
-    83% { transform: translateX(calc(50% - 150px)); }
-    90% { transform: translateX(calc(50% - 150px)); }
-    98% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .health-tips-content {
-    animation-duration: 45s;
-  }
-  
-  .health-tip-item {
-    margin: 0 15px;
-    padding: 10px 16px;
-  }
-  
-  .health-tip-text {
-    font-size: 13px;
-  }
-}
-
-/* Dark theme support */
-.dark .health-tips-marquee {
-  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-}
-
-.dark .health-tip-item {
-  background: rgba(45, 55, 72, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .health-tip-text {
-  color: #e2e8f0;
-}
-
-/* Compact variant for smaller sections */
-.health-tips-marquee--compact {
-  padding: 12px 0;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
-}
-
-.health-tips-marquee--compact .health-tip-item {
-  margin: 0 15px;
-  padding: 8px 16px;
-  border-radius: 20px;
-}
-
-.health-tips-marquee--compact .health-tip-text {
-  font-size: 13px;
-}
-
-.health-tips-marquee--compact .health-tip-icon {
-  font-size: 16px;
-}
-
-/* Step-by-step Health Tips Marquee */
-.health-tips-marquee-step {
-  position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.health-tips-marquee-step::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(102, 126, 234, 0.1) 0%, 
-    rgba(118, 75, 162, 0.1) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.health-tip-step-container {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60px;
-}
-
-.health-tip-item-step {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 16px 32px;
-  border-radius: 30px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  max-width: 90%;
-  text-align: center;
-  animation: tipSlideIn 0.6s ease-out;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.health-tip-item-step:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
-.health-tip-item-step .health-tip-icon {
-  font-size: 24px;
-  margin-right: 16px;
-  flex-shrink: 0;
-}
-
-.health-tip-item-step .health-tip-text {
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-/* Tip indicators */
-.tip-indicators {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
-  justify-content: center;
-}
-
-.tip-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.tip-indicator.active {
-  background: rgba(255, 255, 255, 0.9);
-  transform: scale(1.3);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-.tip-indicator:hover {
-  background: rgba(255, 255, 255, 0.7);
-  transform: scale(1.2);
-}
-
-/* Slide in animation for new tips */
-@keyframes tipSlideIn {
-  0% {
-    opacity: 0;
-    transform: translateX(100px) scale(0.8);
-  }
-  100% {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translateY(0);
   }
 }
 
-/* Compact variant for step marquee */
-.health-tips-marquee-step--compact {
-  padding: 16px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  box-shadow: 0 3px 15px rgba(79, 70, 229, 0.3);
-  min-height: 80px;
-}
-
-.health-tips-marquee-step--compact .health-tip-item-step {
-  padding: 12px 24px;
-  border-radius: 25px;
-}
-
-.health-tips-marquee-step--compact .health-tip-item-step .health-tip-icon {
-  font-size: 20px;
-  margin-right: 12px;
-}
-
-.health-tips-marquee-step--compact .health-tip-item-step .health-tip-text {
-  font-size: 14px;
-}
-
-.health-tips-marquee-step--compact .tip-indicators {
-  margin-top: 12px;
-}
-
-.health-tips-marquee-step--compact .tip-indicator {
-  width: 6px;
-  height: 6px;
-}
-
-/* Health Tips Flowing Marquee - Right to Left Animation */
-.health-tips-marquee-flow {
-  overflow: hidden;
-  white-space: nowrap;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 16px 0;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-  height: 80px;
-  display: flex;
-  align-items: center;
-}
-
-.health-tips-marquee-flow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    rgba(102, 126, 234, 0.9) 0%, 
-    rgba(102, 126, 234, 0.1) 20%, 
-    rgba(102, 126, 234, 0.1) 80%, 
-    rgba(102, 126, 234, 0.9) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.health-tip-flow-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.health-tip-flowing-item {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 12px 24px;
-  border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  white-space: nowrap;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  animation: flow-right-to-left 6s ease-in-out infinite;
-  z-index: 2;
-}
-
-.health-tip-flowing-item.paused {
-  animation-play-state: paused;
-}
-
-.health-tip-flowing-item:hover {
-  transform: translateY(-50%) scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-@keyframes flow-right-to-left {
-  0% {
-    left: 100%;
+@keyframes slideIn {
+  from {
     opacity: 0;
+    transform: translateX(30px);
   }
-  15% {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-purple {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Medical Theme Specific Styles */
+.medical-gradient {
+  background: linear-gradient(135deg, #3b82f6, #10b981, #06b6d4);
+  background-size: 300% 300%;
+  animation: gradientShift 6s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Loading States */
+.loading-skeleton {
+  @apply bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700;
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Focus and Accessibility */
+.focus-visible {
+  @apply outline-none ring-2 ring-blue-500/50 ring-offset-2 ring-offset-slate-900;
+}
+
+/* Modern Shadows */
+.shadow-glow-blue {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+.shadow-glow-emerald {
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+}
+
+.shadow-glow-purple {
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+/* Healthcare Icon Styles */
+.medical-icon {
+  @apply w-16 h-16 rounded-2xl flex items-center justify-center;
+  @apply text-2xl font-bold text-white;
+  @apply bg-gradient-to-br from-blue-500 to-emerald-500;
+  @apply shadow-lg hover:shadow-xl;
+  @apply transform hover:scale-110;
+  @apply transition-all duration-300;
+}
+
+/* Responsive Breakpoints Enhancement */
+@media (max-width: 640px) {
+  .mobile-padding {
+    @apply px-4;
+  }
+  
+  .mobile-text {
+    @apply text-4xl;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-spacing {
+    @apply space-y-32;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-500);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
     opacity: 1;
   }
   50% {
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    left: -100%;
-    opacity: 0;
+    opacity: 0.5;
   }
 }
 
-.health-tips-marquee-flow--compact {
-  padding: 12px 0;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
-  height: 60px;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.health-tips-marquee-flow--compact .health-tip-flowing-item {
-  padding: 8px 16px;
-  border-radius: 20px;
+/* Utility Classes */
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-.health-tips-marquee-flow--compact .health-tip-text {
-  font-size: 13px;
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
 }
 
-.health-tips-marquee-flow--compact .health-tip-icon {
-  font-size: 16px;
-  margin-right: 8px;
+.animate-scale {
+  animation: scale 0.2s ease-in-out;
 }
 
-.health-tips-marquee-flow .tip-indicators {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  z-index: 3;
+.animate-bounce {
+  animation: bounce 0.3s ease-in-out;
 }
 
-.health-tips-marquee-flow .tip-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Glass Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient Backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--secondary-500), var(--secondary-600));
+}
+
+.gradient-health {
+  background: linear-gradient(135deg, var(--primary-400), var(--secondary-400));
+}
+
+/* Card Styles */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px var(--shadow);
   transition: all 0.3s ease;
 }
 
-.health-tips-marquee-flow .tip-indicator.active {
-  background: rgba(255, 255, 255, 0.9);
-  transform: scale(1.2);
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px var(--shadow);
 }
 
-.health-tips-marquee-flow .tip-indicator:hover {
-  background: rgba(255, 255, 255, 0.7);
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
-.health-tips-marquee-flow--compact .tip-indicators {
-  bottom: 4px;
+.btn-primary {
+  background: var(--primary-500);
+  color: white;
 }
 
-.health-tips-marquee-flow--compact .tip-indicator {
-  width: 6px;
-  height: 6px;
+.btn-primary:hover {
+  background: var(--primary-600);
+  transform: translateY(-1px);
 }
 
+.btn-secondary {
+  background: var(--secondary-500);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: var(--secondary-600);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary-500);
+  border: 1px solid var(--primary-500);
+}
+
+.btn-outline:hover {
+  background: var(--primary-500);
+  color: white;
+}
+
+/* Input Styles */
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Health-themed Icons */
+.health-icon {
+  background: linear-gradient(135deg, var(--primary-400), var(--secondary-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-secondary), var(--border-color), var(--bg-secondary));
+  background-size: 200% 100%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .health-tips-marquee-flow {
-    height: 70px;
+  .mobile-hidden {
+    display: none;
   }
   
-  .health-tip-flowing-item {
-    padding: 10px 20px;
+  .mobile-full {
+    width: 100%;
   }
   
-  .health-tip-text {
-    font-size: 13px;
+  .card {
+    margin: 0.5rem;
   }
-  
-  .health-tips-marquee-flow--compact {
-    height: 50px;
+}
+
+/* Focus States for Accessibility */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+a:focus {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .print-hidden {
+    display: none !important;
   }
+}
+
+/* Consistent Color Utility Classes */
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-tertiary { background-color: var(--bg-tertiary); }
+.bg-elevated { background-color: var(--bg-elevated); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--text-accent); }
+.text-success { color: var(--text-success); }
+.text-warning { color: var(--text-warning); }
+.text-error { color: var(--text-error); }
+
+.border-primary { border-color: var(--border-primary); }
+.border-secondary { border-color: var(--border-secondary); }
+.border-accent { border-color: var(--border-accent); }
+
+.shadow-consistent-sm { box-shadow: var(--shadow-sm); }
+.shadow-consistent-md { box-shadow: var(--shadow-md); }
+.shadow-consistent-lg { box-shadow: var(--shadow-lg); }
+.shadow-consistent-xl { box-shadow: var(--shadow-xl); }
+.shadow-glow { box-shadow: var(--shadow-glow); }
+
+/* High Contrast Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+  color: #ffffff;
+  border: 1px solid var(--primary-500);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+  scale: 1.02;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  scale: 1;
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--secondary-600), var(--secondary-700));
+  color: #ffffff;
+  border: 1px solid var(--secondary-500);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, var(--secondary-700), var(--secondary-800));
+  transform: translateY(-2px);
+  scale: 1.02;
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+  scale: 1;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-accent);
+  border: 2px solid var(--border-accent);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.btn-outline:hover {
+  background: var(--bg-elevated);
+  color: #ffffff;
+  border-color: var(--primary-400);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Glassmorphism Consistent Styles */
+.glass {
+  background: rgba(71, 85, 105, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.glass-elevated {
+  background: rgba(71, 85, 105, 0.2);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }

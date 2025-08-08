@@ -2,6 +2,7 @@ const User = require('../models/User');
 const HealthRecord = require('../models/HealthRecord');
 const Document = require('../models/Document');
 const Prediction = require('../models/Prediction');
+const Appointment = require('../models/Appointment');
 
 // Get all patients for doctor management
 const getAllPatients = async (req, res) => {
@@ -175,9 +176,71 @@ const addConsultationNote = async (req, res) => {
   }
 };
 
+// Get doctor appointment statistics
+const getDoctorAppointmentStats = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    
+    // Get all appointments for this doctor
+    const totalAppointments = await Appointment.countDocuments({ doctorId });
+    
+    // Get today's appointments
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    
+    const todayAppointments = await Appointment.countDocuments({
+      doctorId,
+      datetime: { $gte: startOfDay, $lt: endOfDay }
+    });
+    
+    // Get pending appointments
+    const pendingAppointments = await Appointment.countDocuments({
+      doctorId,
+      status: 'pending'
+    });
+    
+    // Get completed appointments
+    const completedAppointments = await Appointment.countDocuments({
+      doctorId,
+      status: 'completed'
+    });
+    
+    // Get confirmed appointments
+    const confirmedAppointments = await Appointment.countDocuments({
+      doctorId,
+      status: 'confirmed'
+    });
+    
+    // Get total unique patients
+    const totalPatients = await Appointment.distinct('patientId', { doctorId });
+    
+    const stats = {
+      totalAppointments,
+      todayAppointments,
+      pendingAppointments,
+      completedAppointments,
+      confirmedAppointments,
+      totalPatients: totalPatients.length
+    };
+
+    res.json({
+      success: true,
+      stats
+    });
+  } catch (error) {
+    console.error('Get doctor appointment stats error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch doctor appointment statistics'
+    });
+  }
+};
+
 module.exports = {
   getAllPatients,
   getPatientDetails,
   getDoctorStats,
+  getDoctorAppointmentStats,
   addConsultationNote
 };

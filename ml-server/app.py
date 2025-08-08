@@ -51,9 +51,19 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/health')
+def health():
+    return jsonify({
+        'status': 'healthy',
+        'message': 'ML Server for Medical Health Tracker – Pro',
+        'models': list(MODEL_PATHS.keys()),
+        'timestamp': pd.Timestamp.now().isoformat()
+    })
+
 @app.route('/')
 def index():
     return 'ML Server for Medical Health Tracker – Pro'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(host='0.0.0.0', port=port)

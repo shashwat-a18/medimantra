@@ -272,40 +272,40 @@ export default function DoctorAppointments() {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Appointments</h1>
-          <p className="text-gray-600">Manage your patient appointments</p>
+          <h1 className="text-3xl font-bold text-white mb-2">My Appointments</h1>
+          <p className="text-gray-400">Manage your patient appointments</p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Today's Appointments</h3>
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-white mb-2">Today's Appointments</h3>
             <p className="text-3xl font-bold text-blue-600">{todaysAppointments.length}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Scheduled</h3>
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-white mb-2">Scheduled</h3>
             <p className="text-3xl font-bold text-orange-600">{scheduledAppointments.length}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Completed</h3>
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-white mb-2">Completed</h3>
             <p className="text-3xl font-bold text-green-600">{completedAppointments.length}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Total</h3>
-            <p className="text-3xl font-bold text-gray-600">{appointments.length}</p>
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-white mb-2">Total</h3>
+            <p className="text-3xl font-bold text-gray-400">{appointments.length}</p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Filters</h2>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-medium text-white mb-4">Filters</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Statuses</option>
                 <option value="scheduled">Scheduled</option>
@@ -316,12 +316,12 @@ export default function DoctorAppointments() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Date</label>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex items-end">
@@ -331,7 +331,7 @@ export default function DoctorAppointments() {
                   setSelectedDate('');
                   setCurrentPage(1);
                 }}
-                className="w-full bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+                className="w-full bg-slate-800/300 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
               >
                 Clear Filters
               </button>
@@ -340,9 +340,9 @@ export default function DoctorAppointments() {
         </div>
 
         {/* Appointments Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Appointments</h2>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-600">
+            <h2 className="text-lg font-medium text-white">Appointments</h2>
           </div>
           
           {loadingAppointments ? (
@@ -352,7 +352,7 @@ export default function DoctorAppointments() {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-slate-800/30">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Patient
@@ -371,15 +371,15 @@ export default function DoctorAppointments() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 divide-y divide-gray-200">
                   {appointments.map((appointment) => (
                     <tr 
                       key={appointment._id} 
-                      className={`hover:bg-gray-50 ${isAppointmentOverdue(appointment) ? 'bg-red-50' : ''}`}
+                      className={`hover:bg-slate-800/30 ${isAppointmentOverdue(appointment) ? 'bg-red-50' : ''}`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-white">
                             {appointment.patient.name}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -393,7 +393,7 @@ export default function DoctorAppointments() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-white">
                           {formatDate(appointment.appointmentDate)}
                         </div>
                         <div className="text-sm text-gray-500">
@@ -406,7 +406,7 @@ export default function DoctorAppointments() {
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 max-w-xs truncate">
+                        <div className="text-sm text-white max-w-xs truncate">
                           {appointment.reason}
                         </div>
                       </td>
@@ -453,22 +453,22 @@ export default function DoctorAppointments() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+            <div className="px-6 py-4 border-t border-slate-600 flex items-center justify-between">
+              <div className="text-sm text-gray-300">
                 Page {currentPage} of {totalPages}
               </div>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50"
+                  className="px-3 py-1 border border-slate-500 rounded-md text-sm disabled:opacity-50"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50"
+                  className="px-3 py-1 border border-slate-500 rounded-md text-sm disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -480,15 +480,15 @@ export default function DoctorAppointments() {
         {/* Complete Appointment Modal */}
         {showCompleteModal && selectedAppointment && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+              <h3 className="text-lg font-medium text-white mb-4">
                 Complete Appointment - {selectedAppointment.patient.name}
               </h3>
               
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Symptoms
                     </label>
                     <textarea
@@ -496,11 +496,11 @@ export default function DoctorAppointments() {
                       onChange={(e) => setCompletionForm({...completionForm, symptoms: e.target.value})}
                       placeholder="Patient's symptoms"
                       rows={3}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Diagnosis
                     </label>
                     <textarea
@@ -508,13 +508,13 @@ export default function DoctorAppointments() {
                       onChange={(e) => setCompletionForm({...completionForm, diagnosis: e.target.value})}
                       placeholder="Medical diagnosis"
                       rows={3}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Duration (minutes)
                   </label>
                   <input
@@ -523,12 +523,12 @@ export default function DoctorAppointments() {
                     onChange={(e) => setCompletionForm({...completionForm, duration: parseInt(e.target.value)})}
                     min="5"
                     max="180"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Notes
                   </label>
                   <textarea
@@ -536,12 +536,12 @@ export default function DoctorAppointments() {
                     onChange={(e) => setCompletionForm({...completionForm, notes: e.target.value})}
                     placeholder="Additional notes about the appointment"
                     rows={3}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Prescription
                   </label>
                   <textarea
@@ -549,7 +549,7 @@ export default function DoctorAppointments() {
                     onChange={(e) => setCompletionForm({...completionForm, prescription: e.target.value})}
                     placeholder="Prescribed medications and instructions"
                     rows={4}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -562,7 +562,7 @@ export default function DoctorAppointments() {
                       onChange={(e) => setCompletionForm({...completionForm, followUpRequired: e.target.checked})}
                       className="mr-2"
                     />
-                    <label htmlFor="followUpRequired" className="text-sm font-medium text-gray-700">
+                    <label htmlFor="followUpRequired" className="text-sm font-medium text-gray-300">
                       Follow-up required
                     </label>
                   </div>
@@ -570,18 +570,18 @@ export default function DoctorAppointments() {
                   {completionForm.followUpRequired && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Follow-up Date
                         </label>
                         <input
                           type="date"
                           value={completionForm.followUpDate}
                           onChange={(e) => setCompletionForm({...completionForm, followUpDate: e.target.value})}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Follow-up Instructions
                         </label>
                         <textarea
@@ -589,7 +589,7 @@ export default function DoctorAppointments() {
                           onChange={(e) => setCompletionForm({...completionForm, followUpInstructions: e.target.value})}
                           placeholder="Instructions for follow-up appointment"
                           rows={3}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                     </div>
@@ -600,7 +600,7 @@ export default function DoctorAppointments() {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowCompleteModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-slate-500 rounded-md text-gray-300 hover:bg-slate-800/30 transition-colors"
                 >
                   Cancel
                 </button>
@@ -618,20 +618,20 @@ export default function DoctorAppointments() {
         {/* Mark Missed Modal */}
         {showMissedModal && selectedAppointment && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-medium text-white mb-4">
                 Mark Appointment as Missed - {selectedAppointment.patient.name}
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Reason
                   </label>
                   <select
                     value={missedForm.reason}
                     onChange={(e) => setMissedForm({...missedForm, reason: e.target.value})}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="Patient did not show up">Patient did not show up</option>
                     <option value="Patient arrived late">Patient arrived late</option>
@@ -641,7 +641,7 @@ export default function DoctorAppointments() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Additional Notes
                   </label>
                   <textarea
@@ -649,7 +649,7 @@ export default function DoctorAppointments() {
                     onChange={(e) => setMissedForm({...missedForm, notes: e.target.value})}
                     placeholder="Additional details about why the appointment was missed"
                     rows={3}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -657,7 +657,7 @@ export default function DoctorAppointments() {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowMissedModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-slate-500 rounded-md text-gray-300 hover:bg-slate-800/30 transition-colors"
                 >
                   Cancel
                 </button>

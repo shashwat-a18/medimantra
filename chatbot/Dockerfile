@@ -1,14 +1,13 @@
-# Dockerfile for Rasa chatbot
-FROM rasa/rasa:3.6.0
+# Dockerfile for Enhanced Node.js Chatbot
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy Rasa files
-COPY . .
+COPY package*.json ./
+RUN npm ci --only=production
 
-# Train the model
-RUN rasa train
+COPY . .
 
 EXPOSE 5005
 
-CMD ["rasa", "run", "--enable-api", "--cors", "*"]
+CMD ["npm", "start"]

@@ -193,17 +193,17 @@ export default function AdminHealthTracking() {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Patient Health Tracking</h1>
-          <p className="text-gray-600">View and monitor patient health records</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Patient Health Tracking</h1>
+          <p className="text-gray-400">View and monitor patient health records</p>
         </div>
 
         {/* Patient Selection */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Select Patient</h2>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-medium text-white mb-4">Select Patient</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Search Patients
               </label>
               <input
@@ -211,30 +211,30 @@ export default function AdminHealthTracking() {
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Date Filter
               </label>
               <input
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Patient
             </label>
             <select
               value={selectedPatient}
               onChange={(e) => setSelectedPatient(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a patient...</option>
               {filteredPatients.map((patient) => (
@@ -289,9 +289,9 @@ export default function AdminHealthTracking() {
 
         {/* Health Records */}
         {selectedPatient && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-lg font-medium text-gray-900">Health Records</h2>
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-slate-600 flex justify-between items-center">
+              <h2 className="text-lg font-medium text-white">Health Records</h2>
               <span className="text-sm text-gray-500">
                 {healthRecords.length} record(s) found
               </span>
@@ -306,7 +306,7 @@ export default function AdminHealthTracking() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-slate-800/30">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Date
@@ -322,11 +322,11 @@ export default function AdminHealthTracking() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 divide-y divide-gray-200">
                     {healthRecords.map((record) => (
-                      <tr key={record._id} className="hover:bg-gray-50">
+                      <tr key={record._id} className="hover:bg-slate-800/30">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-white">
                             {formatDate(record.date)}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -353,7 +353,7 @@ export default function AdminHealthTracking() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-white">
                             {record.symptoms && record.symptoms.length > 0 ? (
                               <div className="space-y-1">
                                 {record.symptoms.slice(0, 3).map((symptom, index) => (
@@ -392,14 +392,14 @@ export default function AdminHealthTracking() {
         {/* Details Modal */}
         {showDetailsModal && selectedRecord && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
-              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
+              <div className="px-6 py-4 border-b border-slate-600 flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-white">
                   Health Record Details
                 </h2>
                 <button
                   onClick={() => setShowDetailsModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-400"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -410,38 +410,38 @@ export default function AdminHealthTracking() {
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Basic Information</h3>
+                    <h3 className="text-lg font-medium text-white mb-3">Basic Information</h3>
                     <div className="space-y-2">
                       <div>
                         <span className="text-sm font-medium text-gray-500">Date:</span>
-                        <span className="ml-2 text-sm text-gray-900">{formatDate(selectedRecord.date)}</span>
+                        <span className="ml-2 text-sm text-white">{formatDate(selectedRecord.date)}</span>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Patient:</span>
-                        <span className="ml-2 text-sm text-gray-900">{selectedRecord.patient.name}</span>
+                        <span className="ml-2 text-sm text-white">{selectedRecord.patient.name}</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Vital Signs</h3>
+                    <h3 className="text-lg font-medium text-white mb-3">Vital Signs</h3>
                     <div className="space-y-2">
                       {selectedRecord.weight && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">Weight:</span>
-                          <span className="ml-2 text-sm text-gray-900">{selectedRecord.weight} kg</span>
+                          <span className="ml-2 text-sm text-white">{selectedRecord.weight} kg</span>
                         </div>
                       )}
                       {selectedRecord.height && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">Height:</span>
-                          <span className="ml-2 text-sm text-gray-900">{selectedRecord.height} cm</span>
+                          <span className="ml-2 text-sm text-white">{selectedRecord.height} cm</span>
                         </div>
                       )}
                       {selectedRecord.bloodPressure && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">Blood Pressure:</span>
-                          <span className="ml-2 text-sm text-gray-900">
+                          <span className="ml-2 text-sm text-white">
                             {selectedRecord.bloodPressure.systolic}/{selectedRecord.bloodPressure.diastolic} mmHg
                           </span>
                         </div>
@@ -449,19 +449,19 @@ export default function AdminHealthTracking() {
                       {selectedRecord.heartRate && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">Heart Rate:</span>
-                          <span className="ml-2 text-sm text-gray-900">{selectedRecord.heartRate} bpm</span>
+                          <span className="ml-2 text-sm text-white">{selectedRecord.heartRate} bpm</span>
                         </div>
                       )}
                       {selectedRecord.temperature && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">Temperature:</span>
-                          <span className="ml-2 text-sm text-gray-900">{selectedRecord.temperature}°F</span>
+                          <span className="ml-2 text-sm text-white">{selectedRecord.temperature}°F</span>
                         </div>
                       )}
                       {selectedRecord.bloodSugar && (
                         <div>
                           <span className="text-sm font-medium text-gray-500">Blood Sugar:</span>
-                          <span className="ml-2 text-sm text-gray-900">{selectedRecord.bloodSugar} mg/dL</span>
+                          <span className="ml-2 text-sm text-white">{selectedRecord.bloodSugar} mg/dL</span>
                         </div>
                       )}
                     </div>
@@ -470,7 +470,7 @@ export default function AdminHealthTracking() {
 
                 {selectedRecord.symptoms && selectedRecord.symptoms.length > 0 && (
                   <div className="mt-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Symptoms</h3>
+                    <h3 className="text-lg font-medium text-white mb-3">Symptoms</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedRecord.symptoms.map((symptom, index) => (
                         <span key={index} className="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm">
@@ -483,15 +483,15 @@ export default function AdminHealthTracking() {
 
                 {selectedRecord.notes && (
                   <div className="mt-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Notes</h3>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-900 whitespace-pre-wrap">{selectedRecord.notes}</p>
+                    <h3 className="text-lg font-medium text-white mb-3">Notes</h3>
+                    <div className="bg-slate-800/30 rounded-lg p-4">
+                      <p className="text-sm text-white whitespace-pre-wrap">{selectedRecord.notes}</p>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
+              <div className="px-6 py-4 border-t border-slate-600 flex justify-end">
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"

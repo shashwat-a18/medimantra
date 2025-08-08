@@ -1,0 +1,46 @@
+services:
+  # Main Express Server (with integrated chatbot)
+  - type: web
+    name: medimitra-server
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: medimitra-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: ML_SERVER_URL
+        fromService:
+          type: web
+          name: medimitra-ml-server
+          property: host
+
+  # ML Server (Python Flask)
+  - type: web
+    name: medimitra-ml-server
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PORT
+        value: 8000
+
+databases:
+  - name: medimitra-db
+    databaseName: medimitra
+    user: medimitra

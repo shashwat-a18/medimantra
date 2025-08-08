@@ -6,7 +6,8 @@ const {
   getAllPatients,
   getPatientDetails,
   getDoctorStats,
-  addConsultationNote
+  addConsultationNote,
+  getDoctorAppointmentStats
 } = require('../controllers/doctorController');
 
 // Apply auth middleware to all doctor routes
@@ -18,6 +19,9 @@ router.get('/patients', getAllPatients);
 
 // Get doctor dashboard statistics
 router.get('/stats', getDoctorStats);
+
+// Get doctor appointment statistics
+router.get('/appointments/stats', getDoctorAppointmentStats);
 
 // Get specific patient details
 router.get('/patients/:patientId', getPatientDetails);

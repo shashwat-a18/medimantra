@@ -6,6 +6,7 @@ const Reminder = require('../models/Reminder');
 const Appointment = require('../models/Appointment');
 const Notification = require('../models/Notification');
 const Department = require('../models/Department');
+const NotificationService = require('../services/notificationService');
 
 // Get all users for admin management
 const getAllUsers = async (req, res) => {
@@ -56,6 +57,22 @@ const getSystemStats = async (req, res) => {
     const totalPredictions = await Prediction.countDocuments();
     const totalReminders = await Reminder.countDocuments();
     
+    // Appointment statistics
+    const totalAppointments = await Appointment.countDocuments();
+    const pendingAppointments = await Appointment.countDocuments({ status: 'pending' });
+    const confirmedAppointments = await Appointment.countDocuments({ status: 'confirmed' });
+    const completedAppointments = await Appointment.countDocuments({ status: 'completed' });
+    const cancelledAppointments = await Appointment.countDocuments({ status: 'cancelled' });
+    
+    // Today's appointments
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    
+    const todayAppointments = await Appointment.countDocuments({
+      datetime: { $gte: startOfDay, $lt: endOfDay }
+    });
+    
     // Recent activity (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -63,6 +80,7 @@ const getSystemStats = async (req, res) => {
     const recentUsers = await User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
     const recentHealthRecords = await HealthRecord.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
     const recentPredictions = await Prediction.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
+    const recentAppointments = await Appointment.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
     
     // Storage usage (approximate)
     const documentsSize = await Document.aggregate([
@@ -77,6 +95,15 @@ const getSystemStats = async (req, res) => {
         admins: totalAdmins,
         recent: recentUsers
       },
+      appointments: {
+        total: totalAppointments,
+        today: todayAppointments,
+        pending: pendingAppointments,
+        confirmed: confirmedAppointments,
+        completed: completedAppointments,
+        cancelled: cancelledAppointments,
+        recent: recentAppointments
+      },
       content: {
         healthRecords: totalHealthRecords,
         documents: totalDocuments,
@@ -86,7 +113,8 @@ const getSystemStats = async (req, res) => {
       activity: {
         recentUsers,
         recentHealthRecords,
-        recentPredictions
+        recentPredictions,
+        recentAppointments
       },
       storage: {
         totalDocumentSize: documentsSize[0]?.totalSize || 0
@@ -164,18 +192,30 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { isActive: false },
-      { new: true }
-    ).select('-password');
-
+    const user = await User.findById(userId).select('-password');
+    
     if (!user) {
       return res.status(404).json({
         success: false,
         error: 'User not found'
       });
     }
+
+    // Store user info for notification before deletion
+    const userInfo = {
+      name: user.name,
+      role: user.role,
+      email: user.email
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { isActive: false },
+      { new: true }
+    ).select('-password');
+
+    // Notify other admins about user deletion
+    await NotificationService.notifyUserDeleted(userInfo, req.user.id);
 
     res.json({
       success: true,

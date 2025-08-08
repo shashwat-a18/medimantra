@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const NotificationService = require('../services/notificationService');
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -84,6 +85,11 @@ const register = async (req, res) => {
     const user = new User(userData);
 
     await user.save();
+
+    // Send notification about user creation to admins (if not self-registration)
+    if (role !== 'patient') { // Only notify for doctor/admin registrations
+      await NotificationService.notifyUserCreated(user, user._id);
+    }
 
     // Generate token
     const token = generateToken(user._id);

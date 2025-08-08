@@ -9,10 +9,15 @@ interface Notification {
   isRead: boolean;
   priority: 'low' | 'medium' | 'high';
   createdAt: string;
+  actionUrl?: string;
+  metadata?: any;
   relatedAppointment?: {
     appointmentDate: string;
     timeSlot: string;
   };
+  relatedUser?: any;
+  relatedOrder?: any;
+  relatedInventory?: any;
 }
 
 interface NotificationsProps {
@@ -124,12 +129,139 @@ const Notifications: React.FC<NotificationsProps> = ({ isOpen, onClose }) => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
+      // Appointment notifications
       case 'appointment_booked': return '📅';
       case 'appointment_confirmed': return '✅';
       case 'appointment_cancelled': return '❌';
       case 'appointment_reminder': return '⏰';
       case 'appointment_completed': return '🏥';
-      default: return '📋';
+      case 'appointment_rescheduled': return '📅';
+      case 'appointment_rejected': return '🚫';
+      
+      // User management notifications (Admin)
+      case 'user_created': return '👤';
+      case 'user_updated': return '✏️';
+      case 'user_deleted': return '🗑️';
+      case 'user_role_changed': return '🔄';
+      
+      // Inventory notifications (Admin)
+      case 'inventory_low_stock': return '📦';
+      case 'inventory_updated': return '📋';
+      case 'inventory_order_placed': return '🛒';
+      case 'inventory_order_approved': return '✅';
+      case 'inventory_order_rejected': return '❌';
+      
+      // Doctor specific notifications
+      case 'patient_assigned': return '👨‍⚕️';
+      case 'prescription_created': return '💊';
+      case 'lab_results_available': return '🧪';
+      
+      // Patient specific notifications
+      case 'medicine_reminder': return '💊';
+      case 'checkup_reminder': return '🩺';
+      case 'test_reminder': return '🧪';
+      case 'prescription_ready': return '✅';
+      case 'health_tip': return '💡';
+      case 'payment_due': return '💳';
+      
+      // System notifications
+      case 'system_maintenance': return '🔧';
+      case 'security_alert': return '�';
+      case 'policy_update': return '📄';
+      
+      default: return '�📋';
+    }
+  };
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      // High priority (Red)
+      case 'appointment_reminder':
+      case 'medicine_reminder':
+      case 'inventory_low_stock':
+      case 'security_alert':
+      case 'payment_due':
+        return 'border-red-500 bg-red-50';
+      
+      // Medium priority (Blue)
+      case 'appointment_booked':
+      case 'user_created':
+      case 'inventory_order_placed':
+      case 'patient_assigned':
+      case 'checkup_reminder':
+        return 'border-blue-500 bg-blue-50';
+      
+      // Success (Green)
+      case 'appointment_confirmed':
+      case 'appointment_completed':
+      case 'inventory_order_approved':
+      case 'prescription_ready':
+        return 'border-green-500 bg-green-50';
+      
+      // Warning (Yellow)
+      case 'appointment_rescheduled':
+      case 'user_updated':
+      case 'system_maintenance':
+        return 'border-yellow-500 bg-yellow-50';
+      
+      // Error (Red)
+      case 'appointment_cancelled':
+      case 'appointment_rejected':
+      case 'inventory_order_rejected':
+      case 'user_deleted':
+        return 'border-red-500 bg-red-50';
+      
+      default:
+        return 'border-slate-500 bg-slate-50';
+    }
+  };
+
+  const getActionUrl = (notification: Notification) => {
+    if (notification.actionUrl) return notification.actionUrl;
+    
+    // Default navigation based on type
+    switch (notification.type) {
+      case 'appointment_booked':
+      case 'appointment_confirmed':
+      case 'appointment_cancelled':
+      case 'appointment_reminder':
+      case 'appointment_completed':
+      case 'appointment_rescheduled':
+        return user?.role === 'admin' ? '/admin/appointments' : 
+               user?.role === 'doctor' ? '/doctor/appointments' : '/appointments';
+      
+      case 'user_created':
+      case 'user_updated':
+      case 'user_deleted':
+      case 'user_role_changed':
+        return '/admin/users';
+      
+      case 'inventory_low_stock':
+      case 'inventory_updated':
+        return '/admin/inventory';
+      
+      case 'inventory_order_placed':
+      case 'inventory_order_approved':
+      case 'inventory_order_rejected':
+        return user?.role === 'admin' ? '/admin/orders' : '/orders';
+      
+      case 'patient_assigned':
+        return '/doctor/patients';
+      
+      case 'medicine_reminder':
+      case 'checkup_reminder':
+      case 'test_reminder':
+        return '/reminders';
+      
+      case 'prescription_ready':
+      case 'prescription_created':
+        return '/prescriptions';
+      
+      case 'lab_results_available':
+        return '/doctor/patients';
+      
+      default:
+        return '/dashboard';
     }
   };
 
@@ -215,10 +347,17 @@ const Notifications: React.FC<NotificationsProps> = ({ isOpen, onClose }) => {
               {notifications.map(notification => (
                 <div
                   key={notification._id}
-                  className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                    getPriorityColor(notification.priority, notification.isRead)
+                  className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 ${
+                    notification.isRead ? 'bg-gray-50 border-gray-200' : getNotificationColor(notification.type)
                   }`}
-                  onClick={() => !notification.isRead && markAsRead(notification._id)}
+                  onClick={() => {
+                    if (!notification.isRead) markAsRead(notification._id);
+                    // Navigate to relevant page
+                    const url = getActionUrl(notification);
+                    if (url && url !== window.location.pathname) {
+                      window.location.href = url;
+                    }
+                  }}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start flex-1">

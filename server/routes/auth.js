@@ -7,6 +7,11 @@ const {
   getProfile, 
   updateProfile 
 } = require('../controllers/authController');
+const { 
+  getProfileCompletionStatus,
+  updateProfile: updateProfileComplete,
+  getProfile: getProfileComplete
+} = require('../controllers/profileController');
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
@@ -21,11 +26,16 @@ router.post('/login', login);
 // @route   GET /api/auth/profile
 // @desc    Get current user profile
 // @access  Private
-router.get('/profile', auth, getProfile);
+router.get('/profile', auth, getProfileComplete);
 
 // @route   PUT /api/auth/profile
 // @desc    Update user profile
 // @access  Private
-router.put('/profile', auth, updateProfile);
+router.put('/profile', auth, updateProfileComplete);
+
+// @route   GET /api/auth/profile/completion
+// @desc    Get profile completion status
+// @access  Private
+router.get('/profile/completion', auth, getProfileCompletionStatus);
 
 module.exports = router;

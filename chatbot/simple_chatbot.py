@@ -13,6 +13,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import random
 import json
+import os
 from datetime import datetime
 
 app = Flask(__name__)
@@ -169,6 +170,9 @@ if __name__ == '__main__':
     print("Created by: Shashwat Awasthi")
     print("GitHub: https://github.com/shashwat-a18")
     print("LinkedIn: https://www.linkedin.com/in/shashwat-awasthi18/")
-    print("Server will run on http://localhost:5005")
     
-    app.run(host='0.0.0.0', port=5005, debug=True)
+    port = int(os.environ.get('PORT', 5005))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    print(f"Server will run on port {port}")
+    
+    app.run(host='0.0.0.0', port=port, debug=debug)

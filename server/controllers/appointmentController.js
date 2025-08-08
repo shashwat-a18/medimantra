@@ -3,6 +3,13 @@ const User = require('../models/User');
 const Department = require('../models/Department');
 const Reminder = require('../models/Reminder');
 const Notification = require('../models/Notification');
+const NotificationService = require('../services/notificationService');
+const { 
+  validateDoctorForAppointment, 
+  validatePatientForAppointment, 
+  checkTimeSlotAvailability,
+  getAvailableDoctors 
+} = require('../utils/appointmentValidation');
 
 // Create notification helper
 const createNotification = async (recipientId, type, title, message, appointmentId = null) => {
@@ -31,39 +38,24 @@ exports.bookAppointment = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Verify that the user is a registered patient
-    const patient = await User.findById(patientId);
-    if (!patient || patient.role !== 'patient' || !patient.isActive) {
-      return res.status(403).json({ message: 'Only registered patients can book appointments' });
+    // Enhanced patient verification using validation utility
+    const patientValidation = await validatePatientForAppointment(req.user);
+    if (!patientValidation.isValid) {
+      return res.status(403).json({ message: patientValidation.error });
     }
 
-    // Check if doctor exists and is active
-    const doctor = await User.findById(doctorId).populate('department');
-    if (!doctor || doctor.role !== 'doctor' || !doctor.isActive) {
-      return res.status(404).json({ message: 'Doctor not found or inactive' });
+    // Enhanced doctor validation using validation utility
+    const doctorValidation = await validateDoctorForAppointment(doctorId);
+    if (!doctorValidation.isValid) {
+      return res.status(400).json({ message: doctorValidation.error });
     }
+
+    const doctor = doctorValidation.doctor;
 
     // Check if department exists
     const department = await Department.findById(departmentId);
     if (!department || !department.isActive) {
       return res.status(404).json({ message: 'Department not found or inactive' });
-    }
-
-    // Check if doctor belongs to the selected department
-    if (doctor.department._id.toString() !== departmentId) {
-      return res.status(400).json({ message: 'Doctor does not belong to selected department' });
-    }
-
-    // Check if the time slot is available
-    const existingAppointment = await Appointment.findOne({
-      doctor: doctorId,
-      appointmentDate: new Date(appointmentDate),
-      timeSlot,
-      status: { $in: ['scheduled', 'completed'] }
-    });
-
-    if (existingAppointment) {
-      return res.status(400).json({ message: 'Time slot is already booked' });
     }
 
     // Check if appointment date is in the future
@@ -75,6 +67,12 @@ exports.bookAppointment = async (req, res) => {
       return res.status(400).json({ message: 'Cannot book appointment for past dates' });
     }
 
+    // Enhanced time slot availability check using validation utility
+    const availabilityCheck = await checkTimeSlotAvailability(doctorId, selectedDate, timeSlot);
+    if (!availabilityCheck.isAvailable) {
+      return res.status(400).json({ message: availabilityCheck.error });
+    }
+
     // Create the appointment
     const appointment = await Appointment.create({
       patient: patientId,
@@ -83,6 +81,24 @@ exports.bookAppointment = async (req, res) => {
       appointmentDate: selectedDate,
       timeSlot,
       reason
+    });
+
+    // Populate appointment data for notifications
+    const populatedAppointment = await Appointment.findById(appointment._id)
+      .populate('patient', 'name email')
+      .populate('doctor', 'name email')
+      .populate('department', 'name');
+
+    // Enhanced notification system - notify all relevant parties
+    await NotificationService.notifyAppointmentBooked({
+      _id: populatedAppointment._id,
+      patient: populatedAppointment.patient._id,
+      doctor: populatedAppointment.doctor._id,
+      patientName: populatedAppointment.patient.name,
+      doctorName: populatedAppointment.doctor.name,
+      departmentName: populatedAppointment.department.name,
+      appointmentDate: selectedDate,
+      timeSlot
     });
 
     // Create reminder for the patient
@@ -102,32 +118,15 @@ exports.bookAppointment = async (req, res) => {
     appointment.reminder = reminder._id;
     await appointment.save();
 
-    // Create notifications
-    await createNotification(
-      patientId,
-      'appointment_booked',
-      'Appointment Booked Successfully',
-      `Your appointment with Dr. ${doctor.name} has been scheduled for ${selectedDate.toDateString()} at ${timeSlot}`,
-      appointment._id
-    );
-
-    await createNotification(
-      doctorId,
-      'appointment_booked',
-      'New Appointment Booked',
-      `New appointment booked by ${req.user.name} for ${selectedDate.toDateString()} at ${timeSlot}`,
-      appointment._id
-    );
-
     // Populate appointment data for response
-    const populatedAppointment = await Appointment.findById(appointment._id)
+    const responseAppointment = await Appointment.findById(appointment._id)
       .populate('doctor', 'name email specialization')
       .populate('department', 'name')
       .populate('patient', 'name email');
 
     res.status(201).json({
       message: 'Appointment booked successfully',
-      appointment: populatedAppointment
+      appointment: responseAppointment
     });
 
   } catch (error) {
@@ -232,27 +231,28 @@ exports.updateAppointmentStatus = async (req, res) => {
     }
 
     // Update appointment
+    const oldStatus = appointment.status;
     appointment.status = status;
     if (notes) appointment.notes = notes;
     if (prescription) appointment.prescription = prescription;
     
     await appointment.save();
 
-    // Create notification for patient
-    const statusMessages = {
-      completed: 'Your appointment has been completed',
-      cancelled: 'Your appointment has been cancelled',
-      missed: 'Your appointment was marked as missed',
-      rejected: 'Your appointment has been rejected'
-    };
+    // Enhanced notification system - notify all relevant parties
+    const populatedAppointment = await Appointment.findById(appointment._id)
+      .populate('patient', 'name email')
+      .populate('doctor', 'name email')
+      .populate('department', 'name');
 
-    await createNotification(
-      appointment.patient._id,
-      'appointment_' + (status === 'completed' ? 'completed' : 'cancelled'),
-      'Appointment Status Updated',
-      statusMessages[status],
-      appointment._id
-    );
+    await NotificationService.notifyAppointmentStatusChanged({
+      _id: populatedAppointment._id,
+      patient: populatedAppointment.patient._id,
+      doctor: populatedAppointment.doctor._id,
+      patientName: populatedAppointment.patient.name,
+      doctorName: populatedAppointment.doctor.name,
+      appointmentDate: populatedAppointment.appointmentDate,
+      timeSlot: populatedAppointment.timeSlot
+    }, oldStatus, status);
 
     res.json({
       message: 'Appointment status updated successfully',
@@ -330,11 +330,13 @@ exports.getAvailableSlots = async (req, res) => {
       return res.status(400).json({ message: 'Doctor ID and date are required' });
     }
 
-    const doctor = await User.findById(doctorId);
-    if (!doctor || doctor.role !== 'doctor') {
-      return res.status(404).json({ message: 'Doctor not found' });
+    // Validate doctor using utility function
+    const doctorValidation = await validateDoctorForAppointment(doctorId);
+    if (!doctorValidation.isValid) {
+      return res.status(400).json({ message: doctorValidation.error });
     }
 
+    const doctor = doctorValidation.doctor;
     const selectedDate = new Date(date);
     const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -355,12 +357,41 @@ exports.getAvailableSlots = async (req, res) => {
     res.json({
       date: selectedDate,
       availableSlots: freeSlots,
-      bookedSlots
+      bookedSlots,
+      doctorInfo: {
+        name: doctor.name,
+        specialization: doctor.specialization,
+        consultationFee: doctor.consultationFee,
+        department: doctor.department.name
+      }
     });
 
   } catch (error) {
     console.error('Error fetching available slots:', error);
     res.status(500).json({ message: 'Error fetching available slots', error: error.message });
+  }
+};
+
+// Get available doctors for appointment booking
+exports.getAvailableDoctors = async (req, res) => {
+  try {
+    const { departmentId } = req.query;
+
+    const availableDoctors = await getAvailableDoctors(departmentId);
+
+    res.json({
+      success: true,
+      count: availableDoctors.length,
+      data: availableDoctors
+    });
+
+  } catch (error) {
+    console.error('Error fetching available doctors:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching available doctors', 
+      error: error.message 
+    });
   }
 };
 
@@ -663,34 +694,21 @@ exports.adminUpdateAppointmentStatus = async (req, res) => {
 
     await appointment.save();
 
-    // Create notifications for both patient and doctor
-    const statusMessages = {
-      completed: 'marked as completed',
-      cancelled: 'cancelled',
-      missed: 'marked as missed',
-      rejected: 'rejected',
-      rescheduled: 'rescheduled',
-      'no-show': 'marked as no-show',
-      scheduled: 'rescheduled'
-    };
+    // Enhanced notification system - notify all relevant parties  
+    const populatedAppointment = await Appointment.findById(appointment._id)
+      .populate('patient', 'name email')
+      .populate('doctor', 'name email')
+      .populate('department', 'name');
 
-    const message = `Your appointment has been ${statusMessages[status]} by administration`;
-
-    await createNotification(
-      appointment.patient._id,
-      'appointment_status_updated',
-      'Appointment Status Updated',
-      message,
-      appointment._id
-    );
-
-    await createNotification(
-      appointment.doctor._id,
-      'appointment_status_updated',
-      'Appointment Status Updated',
-      `Appointment with ${appointment.patient.name} has been ${statusMessages[status]} by administration`,
-      appointment._id
-    );
+    await NotificationService.notifyAppointmentStatusChanged({
+      _id: populatedAppointment._id,
+      patient: populatedAppointment.patient._id,
+      doctor: populatedAppointment.doctor._id,
+      patientName: populatedAppointment.patient.name,
+      doctorName: populatedAppointment.doctor.name,
+      appointmentDate: populatedAppointment.appointmentDate,
+      timeSlot: populatedAppointment.timeSlot
+    }, oldStatus, status);
 
     res.json({
       message: `Appointment status updated from ${oldStatus} to ${status}`,

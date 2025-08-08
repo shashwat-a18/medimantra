@@ -242,30 +242,30 @@ export default function AdminAppointments() {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Appointment Management</h1>
-          <p className="text-gray-600">Manage all appointments across the platform</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Appointment Management</h1>
+          <p className="text-gray-400">Manage all appointments across the platform</p>
         </div>
 
         {/* Statistics Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Total Appointments</h3>
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+              <h3 className="text-lg font-medium text-white mb-2">Total Appointments</h3>
               <p className="text-3xl font-bold text-blue-600">{stats.totalAppointments}</p>
               <p className="text-sm text-gray-500">This month</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Completion Rate</h3>
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+              <h3 className="text-lg font-medium text-white mb-2">Completion Rate</h3>
               <p className="text-3xl font-bold text-green-600">{stats.completionRate}%</p>
               <p className="text-sm text-gray-500">Appointments completed</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No-Show Rate</h3>
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+              <h3 className="text-lg font-medium text-white mb-2">No-Show Rate</h3>
               <p className="text-3xl font-bold text-red-600">{stats.noShowRate}%</p>
               <p className="text-sm text-gray-500">Missed appointments</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Overdue</h3>
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6">
+              <h3 className="text-lg font-medium text-white mb-2">Overdue</h3>
               <p className="text-3xl font-bold text-orange-600">{overdueAppointments.length}</p>
               <p className="text-sm text-gray-500">Need attention</p>
             </div>
@@ -289,15 +289,15 @@ export default function AdminAppointments() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Filters</h2>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-medium text-white mb-4">Filters</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Statuses</option>
                 <option value="scheduled">Scheduled</option>
@@ -310,22 +310,22 @@ export default function AdminAppointments() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Date</label>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Department</label>
               <input
                 type="text"
                 placeholder="Enter department"
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex items-end">
@@ -336,7 +336,7 @@ export default function AdminAppointments() {
                   setSelectedDepartment('');
                   setCurrentPage(1);
                 }}
-                className="w-full bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+                className="w-full bg-slate-800/300 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
               >
                 Clear Filters
               </button>
@@ -366,9 +366,9 @@ export default function AdminAppointments() {
         )}
 
         {/* Appointments Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">All Appointments</h2>
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-600">
+            <h2 className="text-lg font-medium text-white">All Appointments</h2>
           </div>
           
           {loadingAppointments ? (
@@ -378,7 +378,7 @@ export default function AdminAppointments() {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-slate-800/30">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Patient
@@ -400,12 +400,12 @@ export default function AdminAppointments() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 divide-y divide-gray-200">
                   {appointments.map((appointment) => (
-                    <tr key={appointment._id} className="hover:bg-gray-50">
+                    <tr key={appointment._id} className="hover:bg-slate-800/30">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-white">
                             {appointment.patient?.name || 'Unknown Patient'}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -415,7 +415,7 @@ export default function AdminAppointments() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-white">
                             {appointment.doctor?.name || 'Unknown Doctor'}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -424,14 +424,14 @@ export default function AdminAppointments() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-white">
                           {formatDate(appointment.appointmentDate)}
                         </div>
                         <div className="text-sm text-gray-500">
                           {appointment.timeSlot || 'No time slot'}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                         {appointment.department?.name || 'Unknown Department'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -456,22 +456,22 @@ export default function AdminAppointments() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+            <div className="px-6 py-4 border-t border-slate-600 flex items-center justify-between">
+              <div className="text-sm text-gray-300">
                 Page {currentPage} of {totalPages}
               </div>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50"
+                  className="px-3 py-1 border border-slate-500 rounded-md text-sm disabled:opacity-50"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50"
+                  className="px-3 py-1 border border-slate-500 rounded-md text-sm disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -483,20 +483,20 @@ export default function AdminAppointments() {
         {/* Status Update Modal */}
         {showStatusModal && selectedAppointment && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-medium text-white mb-4">
                 Update Appointment Status
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     New Status
                   </label>
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="scheduled">Scheduled</option>
                     <option value="completed">Completed</option>
@@ -509,7 +509,7 @@ export default function AdminAppointments() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Reason for Change
                   </label>
                   <input
@@ -517,12 +517,12 @@ export default function AdminAppointments() {
                     value={statusReason}
                     onChange={(e) => setStatusReason(e.target.value)}
                     placeholder="Explain why status is being changed"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Admin Notes
                   </label>
                   <textarea
@@ -530,7 +530,7 @@ export default function AdminAppointments() {
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder="Additional administrative notes"
                     rows={3}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -538,7 +538,7 @@ export default function AdminAppointments() {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowStatusModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-slate-500 rounded-md text-gray-300 hover:bg-slate-800/30 transition-colors"
                 >
                   Cancel
                 </button>

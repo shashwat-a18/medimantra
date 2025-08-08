@@ -44,6 +44,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       };
     case 'LOGOUT':
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       return {
         user: null,
         token: null,
@@ -71,13 +72,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Verify token and get user profile
-      fetchProfile(token);
-    } else {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
+    const initializeAuth = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        
+        if (token && userData) {
+          // First restore user from localStorage immediately
+          const user = JSON.parse(userData);
+          dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
+          
+          // Then verify token validity in background
+          await fetchProfile(token);
+        } else {
+          dispatch({ type: 'SET_LOADING', payload: false });
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const fetchProfile = async (token: string) => {
@@ -90,15 +106,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (response.ok) {
         const user = await response.json();
+        localStorage.setItem('user', JSON.stringify(user));
         dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
       } else {
+        // Token is invalid, clear storage
         localStorage.removeItem('token');
-        dispatch({ type: 'SET_LOADING', payload: false });
+        localStorage.removeItem('user');
+        dispatch({ type: 'LOGOUT' });
       }
     } catch (error) {
       console.error('Profile fetch error:', error);
-      localStorage.removeItem('token');
-      dispatch({ type: 'SET_LOADING', payload: false });
+      // Network error, keep user logged in with cached data if available
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        dispatch({ type: 'LOGIN_SUCCESS', payload: { user, token } });
+      } else {
+        localStorage.removeItem('token');
+        dispatch({ type: 'LOGOUT' });
+      }
     }
   };
 
@@ -117,6 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.user, token: data.token } });
       } else {
         throw new Error(data.error || 'Login failed');
@@ -142,6 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.user, token: data.token } });
       } else {
         throw new Error(data.error || 'Registration failed');

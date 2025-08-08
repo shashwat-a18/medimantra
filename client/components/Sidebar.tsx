@@ -19,7 +19,6 @@ export default function Sidebar() {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          // User not authenticated, skip fetching
           return;
         }
         
@@ -33,7 +32,6 @@ export default function Sidebar() {
           const data = await response.json();
           setUnreadCount(data.unread || 0);
         } else if (response.status === 401) {
-          // Token invalid, user should re-authenticate
           console.log('Authentication expired, please login again');
         }
       } catch (error) {
@@ -41,10 +39,8 @@ export default function Sidebar() {
       }
     };
 
-    // Only fetch if user is authenticated
     if (user) {
       fetchUnreadCount();
-      // Refresh count every 30 seconds
       const interval = setInterval(fetchUnreadCount, 30000);
       return () => clearInterval(interval);
     }
@@ -55,100 +51,147 @@ export default function Sidebar() {
     router.push('/');
   };
 
-  const navigationLinks = [
-    { href: '/dashboard', label: 'Dashboard', icon: '🏠' },
-    { href: '/health/tracking', label: 'Health Tracking', icon: '📊' },
-    { href: '/health/predict', label: 'AI Predictions', icon: '🤖' },
-    { href: '/appointments', label: 'Appointments', icon: '📅' },
-    { href: '/reminders', label: 'Reminders', icon: '⏰' },
-    { href: '/ehr/upload', label: 'Documents', icon: '📁' },
-    { href: '/chatbot', label: 'AI Assistant', icon: '💬' }
-  ];
+  // Role-based navigation links
+  const getNavigationLinks = () => {
+    if (user?.role === 'admin') {
+      return [
+        { href: '/admin/dashboard', label: 'Admin Dashboard', icon: '⚙️' },
+        { href: '/admin/chatbot', label: 'System Assistant', icon: '🤖' },
+        { href: '/admin/users', label: 'User Management', icon: '👥' },
+        { href: '/admin/appointments', label: 'Appointment Management', icon: '📅' },
+        { href: '/admin/inventory', label: 'Inventory Management', icon: '📦' },
+        { href: '/admin/documents', label: 'Document Management', icon: '📁' },
+        { href: '/admin/departments', label: 'Department Management', icon: '🏢' },
+        { href: '/admin/reports', label: 'Analytics & Reports', icon: '📊' },
+        { href: '/admin/settings', label: 'System Settings', icon: '⚙️' }
+      ];
+    }
 
-  // Add role-specific links
-  if (user?.role === 'admin') {
-    navigationLinks.push({ href: '/admin/dashboard', label: 'Admin Dashboard', icon: '⚙️' });
-  }
-  if (user?.role === 'doctor') {
-    navigationLinks.push({ href: '/doctor', label: 'Doctor Portal', icon: '👨‍⚕️' });
-  }
+    if (user?.role === 'doctor') {
+      return [
+        { href: '/doctor/dashboard', label: 'Doctor Dashboard', icon: '👨‍⚕️' },
+        { href: '/doctor/chatbot', label: 'Clinical Assistant', icon: '🩺' },
+        { href: '/doctor/patients', label: 'My Patients', icon: '👤' },
+        { href: '/doctor/appointments', label: 'My Appointments', icon: '📅' },
+        { href: '/doctor/schedule', label: 'My Schedule', icon: '🗓️' },
+        { href: '/ehr', label: 'Patient Records', icon: '📋' },
+        { href: '/doctor/prescriptions', label: 'Prescriptions', icon: '💊' },
+        { href: '/inventory', label: 'Medical Supplies', icon: '📦' },
+        { href: '/reminders', label: 'Clinical Reminders', icon: '⏰' }
+      ];
+    }
+
+    if (user?.role === 'patient') {
+      return [
+        { href: '/dashboard', label: 'My Dashboard', icon: '🏠' },
+        { href: '/chatbot', label: 'Health Assistant', icon: '💬' },
+        { href: '/health/tracking', label: 'Health Tracking', icon: '📊' },
+        { href: '/health/predict', label: 'AI Health Check', icon: '🔍' },
+        { href: '/appointments', label: 'My Appointments', icon: '📅' },
+        { href: '/appointments/book', label: 'Book Appointment', icon: '➕' },
+        { href: '/ehr/upload', label: 'My Documents', icon: '📁' },
+        { href: '/inventory', label: 'Medical Supplies', icon: '🛒' },
+        { href: '/reminders', label: 'My Reminders', icon: '⏰' },
+        { href: '/health/history', label: 'Health History', icon: '📚' }
+      ];
+    }
+
+    return [
+      { href: '/dashboard', label: 'Dashboard', icon: '🏠' },
+      { href: '/chatbot', label: 'Health Assistant', icon: '💬' }
+    ];
+  };
+
+  const navigationLinks = getNavigationLinks();
 
   return (
     <>
-      {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full bg-gradient-to-b from-blue-900 to-blue-800 text-white transition-all duration-300 z-50 flex flex-col ${
-        isCollapsed ? 'w-16' : 'w-16 lg:w-64'
-      }`}>
-        
+      <div
+        className={`fixed left-0 top-0 h-full z-50 flex flex-col transition-all duration-300
+          ${isCollapsed ? 'w-16' : 'w-16 lg:w-72'}
+        `}
+      >
+        {/* Consistent Background */}
+        <div className="absolute inset-0 bg-slate-800/90 backdrop-blur-xl shadow-2xl border-r border-slate-700" style={{ zIndex: 0 }} />
+
         {/* Logo and Brand */}
-        <div className="flex items-center justify-between p-4 border-b border-blue-700 flex-shrink-0">
-          <Link href="/dashboard" className="flex items-center">
-            <img src="/logo.svg" alt="MediMitra" className="h-8 w-8" />
+        <div className="relative flex items-center justify-between p-4 border-b border-slate-700 flex-shrink-0 z-10">
+          <Link href="/dashboard" className="flex items-center group">
+            <img src="/logo.svg" alt="MediMitra" className="h-9 w-9 drop-shadow-lg" />
             {!isCollapsed && (
-              <h1 className="text-xl font-bold ml-3 hidden lg:block">MediMitra</h1>
+              <h1 className="text-2xl font-extrabold ml-3 hidden lg:block text-white tracking-wide group-hover:scale-105 transition-transform">MediMitra</h1>
             )}
           </Link>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 rounded hover:bg-blue-700 transition-colors hidden lg:block"
+            className="p-2 rounded-full hover:bg-slate-700/50 transition-colors hidden lg:block focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-300"
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            {isCollapsed ? '→' : '←'}
+            <span className="text-lg">{isCollapsed ? '»' : '«'}</span>
           </button>
         </div>
 
         {/* User Info */}
         {!isCollapsed && (
-          <div className="p-4 border-b border-blue-700 hidden lg:block flex-shrink-0">
+          <div className="relative p-4 border-b border-slate-700 hidden lg:block flex-shrink-0 z-10">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-lg font-semibold">
+              <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-emerald-500 shadow-xl rounded-full flex items-center justify-center text-xl font-bold text-white ring-2 ring-blue-500/30">
                 {user?.name?.charAt(0).toUpperCase()}
               </div>
               <div className="ml-3">
-                <p className="font-medium">{user?.name}</p>
-                <p className="text-blue-200 text-sm capitalize">{user?.role}</p>
+                <p className="font-semibold text-white text-base leading-tight">{user?.name}</p>
+                <p className="text-slate-300 text-xs capitalize tracking-wide">{user?.role}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Navigation Links - Scrollable */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 sidebar-nav">
+        {/* Navigation Links */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 sidebar-nav relative z-10">
           <ul className="space-y-2">
-            {navigationLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className={`flex items-center p-3 rounded-lg transition-colors ${
-                    router.pathname === link.href
-                      ? 'bg-blue-600 text-white'
-                      : 'text-blue-100 hover:bg-blue-700 hover:text-white'
-                  }`}
-                  title={isCollapsed ? link.label : ''}
-                >
-                  <span className="text-xl">{link.icon}</span>
-                  {!isCollapsed && (
-                    <span className="ml-3 font-medium hidden lg:inline">{link.label}</span>
-                  )}
-                </Link>
-              </li>
-            ))}
-            
+            {navigationLinks.map((link) => {
+              const isActive = router.pathname === link.href;
+              return (
+                <li key={link.href} className="relative">
+                  <Link
+                    href={link.href}
+                    className={`flex items-center p-3 rounded-xl transition-all font-medium group
+                      ${isActive ? 'bg-gradient-to-r from-blue-600 to-emerald-600 text-white shadow-xl' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'}
+                      ${isActive ? 'ring-2 ring-blue-500/30' : ''}
+                    `}
+                    title={isCollapsed ? link.label : ''}
+                  >
+                    {/* Vertical pill indicator for active link */}
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1.5 bg-gradient-to-b from-emerald-400 to-blue-400 rounded-full shadow-glow" />
+                    )}
+                    <span className="text-xl drop-shadow-lg mr-0.5">{link.icon}</span>
+                    {!isCollapsed && (
+                      <span className="ml-3 font-semibold hidden lg:inline tracking-wide group-hover:scale-105 transition-transform">
+                        {link.label}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+
             {/* Notifications Button */}
-            <li>
+            <li className="relative">
               <button
                 onClick={() => setShowNotifications(true)}
-                className="flex items-center w-full p-3 rounded-lg transition-colors text-blue-100 hover:bg-blue-700 hover:text-white relative"
+                className="flex items-center w-full p-3 rounded-xl transition-all text-slate-300 hover:bg-slate-700/50 hover:text-white relative font-medium group"
                 title={isCollapsed ? 'Notifications' : ''}
               >
-                <span className="text-xl">🔔</span>
+                <span className="text-xl mr-0.5">🔔</span>
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 left-5 w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span className="absolute top-2 left-7 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                 )}
                 {!isCollapsed && (
-                  <span className="ml-3 font-medium hidden lg:flex lg:items-center">
+                  <span className="ml-3 font-semibold hidden lg:flex lg:items-center tracking-wide">
                     Notifications
                     {unreadCount > 0 && (
-                      <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+                      <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full shadow">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
@@ -159,23 +202,29 @@ export default function Sidebar() {
           </ul>
         </nav>
 
+        {/* Bottom spacer */}
+        <div className="relative p-4 flex-shrink-0 z-10">
+          <div className={`flex items-center w-full ${isCollapsed ? 'justify-center' : ''}`}>
+            {/* Theme toggle removed - using dark theme only */}
+          </div>
+        </div>
+
         {/* Logout Button */}
-        <div className="p-4 border-t border-blue-700 flex-shrink-0">
+        <div className="relative p-4 border-t border-slate-700 flex-shrink-0 z-10">
           <button
             onClick={handleLogout}
-            className={`flex items-center w-full p-3 rounded-lg bg-red-600 hover:bg-red-700 transition-colors ${
+            className={`flex items-center w-full p-3 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 transition-all shadow-xl font-semibold text-white hover:shadow-2xl ${
               isCollapsed ? 'justify-center' : ''
             }`}
             title={isCollapsed ? 'Logout' : ''}
           >
             <span className="text-xl">🚪</span>
-            {!isCollapsed && <span className="ml-3 font-medium hidden lg:inline">Logout</span>}
+            {!isCollapsed && <span className="ml-3 font-semibold hidden lg:inline tracking-wide">Logout</span>}
           </button>
         </div>
       </div>
 
-      {/* Notifications Modal */}
-      <Notifications 
+      <Notifications
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
       />
