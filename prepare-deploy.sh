@@ -27,15 +27,13 @@ cd server
 node -c server.js && echo "✅ Server syntax check passed"
 cd ../ml-server
 python -c "import app; print('✅ ML server import check passed')" || echo "⚠️ ML server check failed"
-cd ../chatbot
-python -c "import simple_chatbot; print('✅ Chatbot import check passed')" || echo "⚠️ Chatbot check failed"
 cd ..
 
 echo "✅ Build preparation complete!"
 echo ""
 echo "Next steps:"
 echo "1. Push your code to GitHub"
-echo "2. Set up services on Render (server, ml-server, chatbot)"
+echo "2. Set up services on Render (server and ml-server)"
 echo "3. Deploy frontend on Vercel"
 echo "4. Configure environment variables"
 echo ""
