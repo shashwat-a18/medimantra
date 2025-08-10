@@ -22,7 +22,7 @@ connectDB().then((connection) => {
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://medimitra.com', 'https://www.medimitra.com'] 
+    ? (process.env.CORS_ORIGIN || 'https://medimantra.vercel.app').split(',')
     : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
   credentials: true
 }));
