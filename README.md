@@ -12,7 +12,7 @@ A comprehensive Medical Health Tracker platform enabling users to track health v
 - Frontend: Next.js 15+ (TypeScript, Tailwind CSS)
 - Backend: Express.js (Node.js, MongoDB) with integrated chatbot
 - ML Server: Flask (Python with scikit-learn)
-- Chatbot: Node.js with Natural NLP (integrated into backend)
+- Chatbot: Node.js with NLP (integrated into backend)
 
 **Features:**
 - Multi-role system (Patient/Doctor/Admin)
