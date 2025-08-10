@@ -21,10 +21,12 @@ connectDB().then((connection) => {
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? (process.env.CORS_ORIGIN || 'https://medimantra.vercel.app').split(',')
-    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
-  credentials: true
+  origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production'
+    ? 'https://medimantra.vercel.app'
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002']),
+  credentials: true,
+  methods: process.env.CORS_METHODS || 'GET,POST,PUT,DELETE,OPTIONS',
+  allowedHeaders: process.env.CORS_ALLOWED_HEADERS || 'Content-Type,Authorization',
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
