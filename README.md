@@ -54,7 +54,7 @@ A comprehensive Medical Health Tracker platform enabling users to track health v
    ```
 
 3. **Environment Configuration:**
-   - Copy `.env.example` to `.env` in root directory
+   - Copy `example.env` to `.env` in each service directory
    - Create `client/.env.local` with frontend environment variables
    - Create `server/.env` with backend environment variables
    - Configure MongoDB connection string
