@@ -4,8 +4,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Notifications from './Notifications';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
+import { API_CONFIG } from '../utils/api';
 export default function Sidebar() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -22,7 +21,7 @@ export default function Sidebar() {
           return;
         }
         
-        const response = await fetch(`${API_BASE_URL}/notifications/stats`, {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/notifications/stats`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

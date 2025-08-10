@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
+import { API_CONFIG } from '../../utils/api';
 
 interface SystemSettings {
   siteName: string;
@@ -16,7 +17,7 @@ interface SystemSettings {
   requireTwoFactor: boolean;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
 
 export default function AdminSettings() {
   const { isAuthenticated, loading, token, user } = useAuth();
@@ -37,6 +38,25 @@ export default function AdminSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
 
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/settings`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(data);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/login');
@@ -47,13 +67,25 @@ export default function AdminSettings() {
     }
   }, [isAuthenticated, loading, router, user]);
 
-  const fetchSettings = async () => {
+      const updateSettings = async () => {
     try {
-      // Mock data - in real app, fetch from API
-      setIsLoading(false);
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/settings`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settings)
+      });
+      
+      if (response.ok) {
+        alert('Settings updated successfully!');
+      } else {
+        alert('Failed to update settings');
+      }
     } catch (error) {
-      console.error('Error fetching settings:', error);
-      setIsLoading(false);
+      console.error('Error updating settings:', error);
+      alert('Error updating settings');
     }
   };
 

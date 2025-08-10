@@ -3,7 +3,13 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const { initializeReminders } = require('./controllers/reminderController');
 const ReminderScheduler = require('./services/reminderScheduler');
+const { logEnvironmentStatus } = require('./utils/validateEnv');
 require('dotenv').config();
+
+// Validate environment variables before starting
+if (!logEnvironmentStatus()) {
+  process.exit(1);
+}
 
 // Initialize Express app
 const app = express();
@@ -20,10 +26,14 @@ connectDB().then((connection) => {
 });
 
 // Middleware
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
+const corsOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : process.env.NODE_ENV === 'production' 
     ? ['https://medimitra.com', 'https://www.medimitra.com'] 
-    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'],
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
+
+app.use(cors({
+  origin: corsOrigins,
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));

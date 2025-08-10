@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 
+import { API_CONFIG } from '../utils/api';
 interface PatientRecord {
   _id: string;
   patientId: string;
@@ -16,8 +17,6 @@ interface PatientRecord {
   medicalConditions: string[];
   lastDiagnosis?: string;
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function PatientRecords() {
   const { isAuthenticated, loading, token, user } = useAuth();

@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 
+import { API_CONFIG } from '../utils/api';
 interface DashboardStats {
   totalPatients: number;
   todayAppointments: number;
@@ -17,8 +18,6 @@ interface Appointment {
   type: string;
   status: 'scheduled' | 'completed' | 'cancelled';
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function DoctorDashboard() {
   const { isAuthenticated, loading, token, user } = useAuth();

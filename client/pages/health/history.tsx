@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 
+import { API_CONFIG } from '../utils/api';
 interface HealthRecord {
   _id: string;
   date: string;
@@ -13,8 +14,6 @@ interface HealthRecord {
   status: 'completed' | 'pending' | 'scheduled';
   attachments?: string[];
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function HealthHistory() {
   const { isAuthenticated, loading, token, user } = useAuth();

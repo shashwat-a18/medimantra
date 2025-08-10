@@ -5,6 +5,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { Card, Button, Input, Badge } from '../../components/ui/ModernComponents';
 import axios from 'axios';
 
+import { API_CONFIG } from '../utils/api';
 interface PredictionResult {
   prediction: number;
   riskLevel: string;
@@ -12,8 +13,6 @@ interface PredictionResult {
   recommendations: string[];
   shapValues?: any;
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function HealthPredict() {
   const { isAuthenticated, loading, token } = useAuth();
@@ -95,7 +94,7 @@ export default function HealthPredict() {
           break;
       }
 
-      const response = await axios.post(`${API_BASE_URL}${endpoint}`, data, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}${endpoint}`, data, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

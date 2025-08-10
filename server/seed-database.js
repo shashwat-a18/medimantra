@@ -488,8 +488,9 @@ const generateNotifications = async (users, appointments, count = 400) => {
 // Main seeding function
 const seedDatabase = async () => {
   try {
-    // Connect to MongoDB
-    await mongoose.connect('mongodb://localhost:27017/medimitra', {
+    // Connect to MongoDB using environment variables
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/medimitra';
+    await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

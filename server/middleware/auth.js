@@ -9,6 +9,12 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ error: 'Access denied. No token provided.' });
     }
 
+    // Check if JWT_SECRET is defined
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET environment variable is not defined');
+      return res.status(500).json({ error: 'Server configuration error.' });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId).select('-password');
 

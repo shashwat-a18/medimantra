@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 import { Card, Button, Input, Badge } from '../../components/ui/ModernComponents';
 
+import { API_CONFIG } from '../utils/api';
 interface Department {
   _id: string;
   name: string;
@@ -12,8 +13,6 @@ interface Department {
   isActive: boolean;
   createdAt: string;
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function AdminDepartments() {
   const { isAuthenticated, loading, token, user } = useAuth();
@@ -39,7 +38,7 @@ export default function AdminDepartments() {
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/departments`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/departments`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -59,7 +58,7 @@ export default function AdminDepartments() {
   const handleAddDepartment = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/departments`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/departments`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -80,7 +79,7 @@ export default function AdminDepartments() {
 
   const toggleDepartmentStatus = async (departmentId: string, currentStatus: boolean) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/departments/${departmentId}`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/departments/${departmentId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

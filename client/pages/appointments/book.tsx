@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 
+import { API_CONFIG } from '../utils/api';
 interface Doctor {
   _id: string;
   name: string;
@@ -24,8 +25,6 @@ interface AppointmentData {
   reason: string;
   symptoms: string;
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export default function BookAppointment() {
   const { isAuthenticated, loading, token, user } = useAuth();

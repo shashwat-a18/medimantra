@@ -8,13 +8,20 @@ import pandas as pd
 from explainability.shap_utils import get_shap_explanation
 
 app = Flask(__name__)
-CORS(app)
+
+# CORS Configuration with environment variables
+cors_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5000').split(',')
+CORS(app, origins=[origin.strip() for origin in cors_origins])
+
+# Model configuration
+MODEL_PATH = os.environ.get('MODEL_PATH', 'models')
+ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 
 # Model registry
 MODEL_PATHS = {
-    'diabetes': os.path.join('models', 'diabetes.pkl'),
-    'heart': os.path.join('models', 'heart.pkl'),
-    'stroke': os.path.join('models', 'stroke.pkl')
+    'diabetes': os.path.join(MODEL_PATH, 'diabetes.pkl'),
+    'heart': os.path.join(MODEL_PATH, 'heart.pkl'),
+    'stroke': os.path.join(MODEL_PATH, 'stroke.pkl')
 }
 
 MODELS = {}
@@ -57,13 +64,27 @@ def health():
         'status': 'healthy',
         'message': 'ML Server for Medical Health Tracker – Pro',
         'models': list(MODEL_PATHS.keys()),
+        'environment': ENVIRONMENT,
+        'cors_origins': cors_origins,
         'timestamp': pd.Timestamp.now().isoformat()
     })
 
 @app.route('/')
 def index():
-    return 'ML Server for Medical Health Tracker – Pro'
+    return jsonify({
+        'service': 'ML Server for Medical Health Tracker – Pro',
+        'status': 'running',
+        'environment': ENVIRONMENT,
+        'endpoints': ['/predict', '/health']
+    })
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))
-    app.run(host='0.0.0.0', port=port)
+    host = os.environ.get('HOST', '0.0.0.0')
+    debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
+    print(f"🤖 Starting ML Server on {host}:{port}")
+    print(f"🌍 Environment: {ENVIRONMENT}")
+    print(f"🔗 CORS Origins: {cors_origins}")
+    
+    app.run(host=host, port=port, debug=debug)
