@@ -18,10 +18,11 @@
     "dev:server": "cd server && npm run dev",
     "dev:ml": "cd ml-server && python app.py",
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:ml\"",
+    "build": "cd client && npm run build",
     "build:client": "cd client && npm run build",
     "start:client": "cd client && npm start",
     "start:server": "cd server && npm start",
-    "start": "npm run start:server",
+    "start": "cd client && npm start",
     "health": "curl -f http://localhost:5000/api/health && curl -f http://localhost:8000/health && curl -f http://localhost:3000/ || echo 'Some services not responding'"
   },
   "keywords": [
