@@ -4,11 +4,6 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "devCommand": "npm run dev",
-  "functions": {
-    "pages/api/**/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "env": {
     "NEXT_PUBLIC_API_URL": "https://medimitra-y0bh.onrender.com/api",
     "NEXT_PUBLIC_ML_SERVER_URL": "https://medimitra-ml-server.onrender.com",
