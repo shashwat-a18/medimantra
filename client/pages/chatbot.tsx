@@ -18,12 +18,12 @@ export default function Chatbot() {
   const getInitialGreeting = () => {
     switch (user?.role) {
       case 'admin':
-        return 'Hello! I\'m MediMitra AI Assistant for System Administrators. I can help you with system management, user queries, and administrative insights.';
+  return 'Hello! I\'m MediMantra AI Assistant for System Administrators. I can help you with system management, user queries, and administrative insights.';
       case 'doctor':
-        return 'Hello Doctor! I\'m MediMitra AI Assistant for Medical Professionals. I can help with diagnostic support, patient information, and clinical guidance.';
+  return 'Hello Doctor! I\'m MediMantra AI Assistant for Medical Professionals. I can help with diagnostic support, patient information, and clinical guidance.';
       case 'patient':
       default:
-        return 'Hello! I\'m MediMitra AI Assistant. I can help you with health information, symptoms, and wellness guidance.';
+  return 'Hello! I\'m MediMantra AI Assistant. I can help you with health information, symptoms, and wellness guidance.';
     }
   };
 
@@ -244,7 +244,7 @@ export default function Chatbot() {
                   <span className="text-white font-bold text-lg">M</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">MediMitra</h1>
+                  <h1 className="text-xl font-bold text-white">MediMantra</h1>
                   <p className="text-xs text-gray-400">AI Assistant</p>
                 </div>
               </Link>

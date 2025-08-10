@@ -26,8 +26,8 @@ export default function Navigation({ variant = 'default' }: NavigationProps) {
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <img src="/logo.svg" alt="MediMitra" className="h-8 w-8 mr-3" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">MediMitra</h1>
+              <img src="/logo.svg" alt="MediMantra" className="h-8 w-8 mr-3" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">MediMantra</h1>
             </Link>
           </div>
           <div className="flex items-center space-x-4">

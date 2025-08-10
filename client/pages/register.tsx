@@ -84,9 +84,9 @@ export default function Register() {
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-800 to-slate-900 flex-col justify-center items-center p-12">
           <div className="max-w-lg text-center">
             <div className="flex items-center justify-center mb-8">
-              <img src="/logo.svg" alt="MediMitra" className="h-16 w-16 mr-4" />
+              <img src="/logo.svg" alt="MediMantra" className="h-16 w-16 mr-4" />
               <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                MediMitra
+                MediMantra
               </h1>
             </div>
             <h2 className="text-3xl font-bold mb-6 text-white">
@@ -127,7 +127,7 @@ export default function Register() {
             <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-8 border border-slate-700 shadow-2xl">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
-                <p className="text-slate-300">Start your health journey with MediMitra</p>
+                <p className="text-slate-300">Start your health journey with MediMantra</p>
               </div>
 
               {error && (

@@ -8,7 +8,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>MediMitra - Modern Health Management Platform</title>
+  <title>MediMantra - Modern Health Management Platform</title>
         <meta name="description" content="Advanced health tracking with AI insights, appointment management, and comprehensive medical records." />
         <link rel="icon" href="/favicon.ico" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />

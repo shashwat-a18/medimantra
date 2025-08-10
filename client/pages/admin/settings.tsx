@@ -23,7 +23,7 @@ export default function AdminSettings() {
   const { isAuthenticated, loading, token, user } = useAuth();
   const router = useRouter();
   const [settings, setSettings] = useState<SystemSettings>({
-    siteName: 'MediMitra Pro',
+  siteName: 'MediMantra Pro',
     siteDescription: 'Advanced Medical Health Tracking Platform',
     maintenanceMode: false,
     emailNotifications: true,

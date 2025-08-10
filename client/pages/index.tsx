@@ -111,9 +111,9 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <img src="/logo.svg" alt="MediMitra" className="h-10 w-10 mr-3" />
+              <img src="/logo.svg" alt="MediMantra" className="h-10 w-10 mr-3" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                MediMitra
+                MediMantra
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -184,7 +184,7 @@ const LandingPage: React.FC = () => {
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
                       </div>
                       <div className="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-md">
-                        MediMitra Dashboard
+                        MediMantra Dashboard
                       </div>
                     </div>
                     
@@ -235,7 +235,7 @@ const LandingPage: React.FC = () => {
               Complete Healthcare Platform
             </h2>
             <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-              Explore all 9 working features of MediMitra - from AI analysis to comprehensive medical management
+              Explore all 9 working features of MediMantra - from AI analysis to comprehensive medical management
             </p>
           </div>
 
@@ -290,7 +290,7 @@ const LandingPage: React.FC = () => {
                 ))}
               </div>
               <p className="text-slate-300 leading-relaxed">
-                "MediMitra has completely transformed how I manage my diabetes. The AI predictions helped me 
+                "MediMantra has completely transformed how I manage my diabetes. The AI predictions helped me 
                 catch complications early, and the appointment booking is so convenient. Best healthcare app I've used!"
               </p>
             </div>
@@ -350,7 +350,7 @@ const LandingPage: React.FC = () => {
               Ready to Transform Your Healthcare?
             </h2>
             <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-              Join thousands of users who trust MediMitra with their health management. 
+              Join thousands of users who trust MediMantra with their health management. 
               Experience AI-powered healthcare today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -375,8 +375,8 @@ const LandingPage: React.FC = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center mb-4">
-                <img src="/logo.svg" alt="MediMitra" className="h-8 w-8 mr-3" />
-                <h3 className="text-xl font-bold">MediMitra</h3>
+                <img src="/logo.svg" alt="MediMantra" className="h-8 w-8 mr-3" />
+                <h3 className="text-xl font-bold">MediMantra</h3>
               </div>
               <p className="text-slate-400">
                 Advanced health management platform powered by AI and designed for modern healthcare needs.
@@ -411,7 +411,7 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-            <p>&copy; 2025 MediMitra. All rights reserved. Built with ❤️ by{' '}
+            <p>&copy; 2025 MediMantra. All rights reserved. Built with ❤️ by{' '}
               <a href="https://www.linkedin.com/in/shashwat-awasthi18/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 font-medium">
                 Shashwat Awasthi
               </a>

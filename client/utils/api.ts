@@ -1,11 +1,11 @@
-// API Configuration for MediMitra Pro
+// API Configuration for MediMantra Pro
 // Uses environment variables for consistent configuration across environments
 
 // Environment variables with fallbacks
 const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   ML_SERVER_URL: process.env.NEXT_PUBLIC_ML_SERVER_URL || 'http://localhost:8000',
-  APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'MediMitra Pro',
+  APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'MediMantra Pro',
   APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
   ENABLE_CHATBOT: process.env.NEXT_PUBLIC_ENABLE_CHATBOT === 'true',
   ENABLE_NOTIFICATIONS: process.env.NEXT_PUBLIC_ENABLE_NOTIFICATIONS === 'true',

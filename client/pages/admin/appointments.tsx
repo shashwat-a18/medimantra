@@ -220,7 +220,7 @@ export default function AdminAppointments() {
                   <span className="text-white font-bold text-lg">M</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">MediMitra</h1>
+                  <h1 className="text-xl font-bold text-white">MediMantra</h1>
                   <p className="text-xs text-gray-400">Admin - Appointments</p>
                 </div>
               </Link>
