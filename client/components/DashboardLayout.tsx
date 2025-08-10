@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <Link href="/dashboard" className="text-2xl font-bold text-white hover:text-blue-400">
-                MediMitra
+                MediMantra
               </Link>
               <div className="hidden md:block">
                 <div className="ml-4 flex items-baseline space-x-4">

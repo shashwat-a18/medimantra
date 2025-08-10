@@ -1,5 +1,5 @@
 """
-Simple script to recreate ML models for MediMitra
+Simple script to recreate ML models for MediMantra
 Created by: Shashwat Awasthi
 GitHub: https://github.com/shashwat-a18
 LinkedIn: https://www.linkedin.com/in/shashwat-awasthi18/

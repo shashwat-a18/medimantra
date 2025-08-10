@@ -1,4 +1,4 @@
-// Role-based permissions system for MediMitra
+// Role-based permissions system for MediMantra
 export interface Permission {
   resource: string;
   actions: string[];

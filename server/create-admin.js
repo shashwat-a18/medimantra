@@ -7,7 +7,7 @@ const User = require('./models/User');
 const createAdminUser = async () => {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/medimitra', {
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/medimantra', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -64,7 +64,7 @@ const createAdminUser = async () => {
 
 // Run if called directly
 if (require.main === module) {
-  console.log('👑 Creating MediMitra Admin User...');
+  console.log('👑 Creating MediMantra Admin User...');
   createAdminUser();
 }
 

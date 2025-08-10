@@ -116,9 +116,9 @@ export default function Sidebar() {
         {/* Logo and Brand */}
         <div className="relative flex items-center justify-between p-4 border-b border-slate-700 flex-shrink-0 z-10">
           <Link href="/dashboard" className="flex items-center group">
-            <img src="/logo.svg" alt="MediMitra" className="h-9 w-9 drop-shadow-lg" />
+            <img src="/logo.svg" alt="MediMantra" className="h-9 w-9 drop-shadow-lg" />
             {!isCollapsed && (
-              <h1 className="text-2xl font-extrabold ml-3 hidden lg:block text-white tracking-wide group-hover:scale-105 transition-transform">MediMitra</h1>
+              <h1 className="text-2xl font-extrabold ml-3 hidden lg:block text-white tracking-wide group-hover:scale-105 transition-transform">MediMantra</h1>
             )}
           </Link>
           <button

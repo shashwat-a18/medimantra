@@ -1,7 +1,7 @@
 services:
   # Main Express Server (with integrated chatbot)
   - type: web
-    name: medimitra-server
+  name: medimantra-server
     runtime: node
     plan: starter
     buildCommand: npm install
@@ -11,7 +11,7 @@ services:
         value: production
       - key: MONGODB_URI
         fromDatabase:
-          name: medimitra-db
+          name: medimantra-db
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
@@ -24,12 +24,12 @@ services:
       - key: ML_SERVER_URL
         fromService:
           type: web
-          name: medimitra-ml-server
+          name: medimantra-ml-server
           property: host
 
   # ML Server (Python Flask)
   - type: web
-    name: medimitra-ml-server
+  name: medimantra-ml-server
     runtime: python
     plan: starter
     buildCommand: pip install -r requirements.txt
@@ -41,6 +41,6 @@ services:
         value: 8000
 
 databases:
-  - name: medimitra-db
-    databaseName: medimitra
-    user: medimitra
+  - name: medimantra-db
+  databaseName: medimantra
+  user: medimantra
