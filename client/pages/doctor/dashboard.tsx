@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 
-import { API_CONFIG } from '../utils/api';
+import { createApiUrl, createApiHeaders } from '../../utils/api';
 interface DashboardStats {
   totalPatients: number;
   todayAppointments: number;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
-import { API_CONFIG } from '../../utils/api';
+import { createApiUrl, createApiHeaders } from '../../utils/api';
 
 interface SystemSettings {
   siteName: string;
@@ -40,11 +40,8 @@ export default function AdminSettings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/settings`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
+      const response = await fetch(createApiUrl('/admin/settings'), {
+        headers: createApiHeaders(localStorage.getItem('token') || undefined)
       });
       if (response.ok) {
         const data = await response.json();
@@ -69,12 +66,9 @@ export default function AdminSettings() {
 
       const updateSettings = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/settings`, {
+      const response = await fetch(createApiUrl('/admin/settings'), {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
+        headers: createApiHeaders(localStorage.getItem('token') || undefined),
         body: JSON.stringify(settings)
       });
       

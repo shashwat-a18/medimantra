@@ -2,14 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_API_URL: API_CONFIG.BASE_URL || 'http://localhost:5000/api',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
     NEXT_PUBLIC_ML_SERVER_URL: process.env.NEXT_PUBLIC_ML_SERVER_URL || 'http://localhost:8000',
   },
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: `${API_CONFIG.BASE_URL || 'http://localhost:5000/api'}/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/:path*`,
       },
     ];
   },

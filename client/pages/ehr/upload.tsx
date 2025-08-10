@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 import axios from 'axios';
 
-import { API_CONFIG } from '../utils/api';
+import { createApiUrl, createApiHeaders } from '../../utils/api';
 interface UploadedDocument {
   id: string;
   fileName: string;
@@ -37,7 +37,7 @@ export default function DocumentUpload() {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get(`${API_CONFIG.BASE_URL}/documents`, {
+      const response = await axios.get(createApiUrl('/documents'), {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -120,7 +120,7 @@ export default function DocumentUpload() {
         formData.append('document', file);
         formData.append('category', 'medical'); // Default category
 
-        const response = await axios.post(`${API_CONFIG.BASE_URL}/documents/upload`, formData, {
+        const response = await axios.post(createApiUrl('/documents/upload'), formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
@@ -159,7 +159,7 @@ export default function DocumentUpload() {
 
   const deleteDocument = async (documentId: string) => {
     try {
-      await axios.delete(`${API_CONFIG.BASE_URL}/documents/${documentId}`, {
+      await axios.delete(createApiUrl(`/documents/${documentId}`), {
         headers: {
           Authorization: `Bearer ${token}`
         }

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 import { Card, Button, Input, Badge } from '../../components/ui/ModernComponents';
 
-import { API_CONFIG } from '../utils/api';
+import { createApiUrl, createApiHeaders } from '../../utils/api';
 interface Department {
   _id: string;
   name: string;
@@ -38,10 +38,8 @@ export default function AdminDepartments() {
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/departments`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await fetch(createApiUrl('/admin/departments'), {
+        headers: createApiHeaders(token || undefined)
       });
 
       if (response.ok) {
@@ -58,12 +56,9 @@ export default function AdminDepartments() {
   const handleAddDepartment = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/departments`, {
+      const response = await fetch(createApiUrl('/admin/departments'), {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: createApiHeaders(token || undefined),
         body: JSON.stringify(newDepartment)
       });
 
@@ -79,12 +74,9 @@ export default function AdminDepartments() {
 
   const toggleDepartmentStatus = async (departmentId: string, currentStatus: boolean) => {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/admin/departments/${departmentId}`, {
+      const response = await fetch(createApiUrl(`/admin/departments/${departmentId}`), {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: createApiHeaders(token || undefined),
         body: JSON.stringify({ isActive: !currentStatus })
       });
 

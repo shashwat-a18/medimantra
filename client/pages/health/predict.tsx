@@ -5,7 +5,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { Card, Button, Input, Badge } from '../../components/ui/ModernComponents';
 import axios from 'axios';
 
-import { API_CONFIG } from '../utils/api';
+import { createApiUrl, createApiHeaders } from '../../utils/api';
 interface PredictionResult {
   prediction: number;
   riskLevel: string;
@@ -94,7 +94,7 @@ export default function HealthPredict() {
           break;
       }
 
-      const response = await axios.post(`${API_CONFIG.BASE_URL}${endpoint}`, data, {
+      const response = await axios.post(createApiUrl(endpoint), data, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

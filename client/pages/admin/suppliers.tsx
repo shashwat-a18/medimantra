@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
 
-import { API_CONFIG } from '../utils/api';
+import { createApiUrl, createApiHeaders } from '../../utils/api';
 interface Supplier {
   _id: string;
   name: string;
@@ -32,7 +32,7 @@ export default function AdminSuppliers() {
   const fetchSuppliers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_CONFIG.BASE_URL}/suppliers`, {
+      const response = await fetch(createApiUrl('/suppliers'), {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -60,12 +60,9 @@ export default function AdminSuppliers() {
   const handleStatusChange = async (supplierId: string, newStatus: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_CONFIG.BASE_URL}/suppliers/${supplierId}`, {
+      const response = await fetch(createApiUrl(`/suppliers/${supplierId}`), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: createApiHeaders(token || undefined),
         body: JSON.stringify({ status: newStatus }),
       });
 

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+require('dotenv').config(); // Load environment variables
 const User = require('./models/User');
 const Department = require('./models/Department');
 const HealthRecord = require('./models/HealthRecord');
@@ -9,94 +10,131 @@ const Prediction = require('./models/Prediction');
 const Reminder = require('./models/Reminder');
 const Notification = require('./models/Notification');
 
-// Sample data arrays
-const firstNames = [
-  'John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'Robert', 'Lisa', 'William', 'Jessica',
-  'James', 'Ashley', 'Christopher', 'Amanda', 'Daniel', 'Stephanie', 'Matthew', 'Nicole', 'Anthony', 'Elizabeth',
-  'Mark', 'Heather', 'Donald', 'Tiffany', 'Steven', 'Michelle', 'Paul', 'Kimberly', 'Andrew', 'Dorothy',
-  'Joshua', 'Lisa', 'Kenneth', 'Nancy', 'Kevin', 'Karen', 'Brian', 'Betty', 'George', 'Helen',
-  'Edward', 'Sandra', 'Ronald', 'Donna', 'Timothy', 'Carol', 'Jason', 'Ruth', 'Jeffrey', 'Sharon',
-  'Ryan', 'Michelle', 'Jacob', 'Laura', 'Gary', 'Sarah', 'Nicholas', 'Kimberly', 'Eric', 'Deborah',
-  'Jonathan', 'Dorothy', 'Stephen', 'Lisa', 'Larry', 'Nancy', 'Justin', 'Karen', 'Scott', 'Betty',
-  'Brandon', 'Helen', 'Benjamin', 'Sandra', 'Samuel', 'Donna', 'Gregory', 'Carol', 'Frank', 'Ruth',
-  'Raymond', 'Sharon', 'Alexander', 'Michelle', 'Patrick', 'Laura', 'Jack', 'Sarah', 'Dennis', 'Kimberly',
-  'Jerry', 'Deborah', 'Tyler', 'Dorothy', 'Aaron', 'Lisa', 'Jose', 'Nancy', 'Henry', 'Karen'
+// Indian context sample data arrays
+const indianFirstNames = [
+  // Male Names
+  'Aarav', 'Arjun', 'Aditya', 'Akash', 'Amit', 'Anuj', 'Ashish', 'Dev', 'Gaurav', 'Harsh',
+  'Ishaan', 'Karan', 'Kartik', 'Krishna', 'Manish', 'Nikhil', 'Pranav', 'Rahul', 'Rohan', 'Sanjay',
+  'Shubham', 'Suresh', 'Varun', 'Vikash', 'Vivek', 'Yash', 'Rajesh', 'Deepak', 'Ravi', 'Sachin',
+  // Female Names  
+  'Aadhya', 'Ananya', 'Anjali', 'Arya', 'Diya', 'Kavya', 'Meera', 'Nisha', 'Pooja', 'Priya',
+  'Riya', 'Sakshi', 'Shreya', 'Sneha', 'Tanvi', 'Vanya', 'Aditi', 'Kritika', 'Neha', 'Swati',
+  'Sunita', 'Rekha', 'Geeta', 'Sita', 'Maya', 'Radha', 'Lakshmi', 'Saraswati', 'Kiran', 'Usha'
 ];
 
-const lastNames = [
-  'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez',
-  'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
-  'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson',
-  'Walker', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores',
-  'Green', 'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell', 'Carter', 'Roberts',
-  'Gomez', 'Phillips', 'Evans', 'Turner', 'Diaz', 'Parker', 'Cruz', 'Edwards', 'Collins', 'Reyes',
-  'Stewart', 'Morris', 'Morales', 'Murphy', 'Cook', 'Rogers', 'Gutierrez', 'Ortiz', 'Morgan', 'Cooper',
-  'Peterson', 'Bailey', 'Reed', 'Kelly', 'Howard', 'Ramos', 'Kim', 'Cox', 'Ward', 'Richardson',
-  'Watson', 'Brooks', 'Chavez', 'Wood', 'James', 'Bennett', 'Gray', 'Mendoza', 'Ruiz', 'Hughes',
-  'Price', 'Alvarez', 'Castillo', 'Sanders', 'Patel', 'Myers', 'Long', 'Ross', 'Foster', 'Jimenez'
+const indianLastNames = [
+  'Sharma', 'Patel', 'Singh', 'Kumar', 'Gupta', 'Agarwal', 'Jain', 'Verma', 'Yadav', 'Mehta',
+  'Shah', 'Joshi', 'Chopra', 'Malhotra', 'Bansal', 'Aggarwal', 'Goyal', 'Arora', 'Mittal', 'Kapoor',
+  'Reddy', 'Nair', 'Iyer', 'Menon', 'Pillai', 'Krishnan', 'Rao', 'Chandra', 'Bhat', 'Shenoy',
+  'Das', 'Ghosh', 'Mukherjee', 'Chatterjee', 'Banerjee', 'Roy', 'Sen', 'Dutta', 'Bose', 'Chakraborty',
+  'Khan', 'Ahmed', 'Ali', 'Hassan', 'Hussain', 'Siddiqui', 'Ansari', 'Qureshi', 'Sheikh', 'Malik'
 ];
 
-const specializations = [
+const indianCities = [
+  'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad', 
+  'Jaipur', 'Surat', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal',
+  'Visakhapatnam', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana', 'Coimbatore', 'Agra', 'Madurai'
+];
+
+const medicalSpecializations = [
   'General Medicine', 'Cardiology', 'Neurology', 'Orthopedics', 'Dermatology',
-  'Pediatrics', 'Psychiatry', 'Oncology', 'Gastroenterology', 'Endocrinology'
+  'Pediatrics', 'Psychiatry', 'Oncology', 'Gastroenterology', 'Endocrinology',
+  'ENT', 'Ophthalmology', 'Gynecology', 'Pulmonology', 'Nephrology',
+  'Ayurveda', 'Homeopathy', 'Physiotherapy', 'Dentistry', 'Emergency Medicine'
 ];
 
-const healthRecordTypes = [
+const indianHealthRecordTypes = [
   'Blood Pressure', 'Weight', 'Blood Sugar', 'Heart Rate', 'Temperature',
-  'Cholesterol', 'BMI', 'Blood Test', 'Vaccination', 'Medication'
+  'Cholesterol', 'BMI', 'HbA1c', 'Vitamin D', 'Thyroid Function',
+  'Liver Function', 'Kidney Function', 'Complete Blood Count', 'ECG', 'Chest X-Ray'
 ];
 
-const appointmentReasons = [
-  'Regular checkup', 'Follow-up visit', 'Chest pain', 'Headache', 'Back pain',
-  'Skin rash', 'Fever', 'Diabetes consultation', 'Blood pressure check', 'Vaccination',
-  'Joint pain', 'Stomach pain', 'Eye examination', 'Dental cleaning', 'Allergy symptoms',
-  'Annual physical', 'Pregnancy checkup', 'Mental health consultation', 'Injury follow-up', 'Prescription refill'
+const commonIndianHealthIssues = [
+  'Diabetes consultation', 'Hypertension checkup', 'Fever and cold', 'Joint pain', 'Skin allergies',
+  'Digestive issues', 'Respiratory problems', 'Heart palpitations', 'Thyroid checkup', 'Vitamin deficiency',
+  'Back pain', 'Migraine', 'Annual health checkup', 'Eye strain', 'Sleep disorders',
+  'Weight management', 'Stress and anxiety', 'Pregnancy consultation', 'Child vaccination', 'Elderly care'
 ];
 
-const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'];
+const indianDepartments = [
+  { name: 'General Medicine', description: 'Primary healthcare and general consultations', icon: 'stethoscope' },
+  { name: 'Cardiology', description: 'Heart and cardiovascular care', icon: 'heart' },
+  { name: 'Orthopedics', description: 'Bone, joint and muscle treatments', icon: 'bone' },
+  { name: 'Pediatrics', description: 'Child healthcare and development', icon: 'baby' },
+  { name: 'Gynecology', description: 'Women\'s health and reproductive care', icon: 'female' },
+  { name: 'ENT', description: 'Ear, Nose and Throat treatments', icon: 'ear' },
+  { name: 'Dermatology', description: 'Skin, hair and nail care', icon: 'skin' },
+  { name: 'Ophthalmology', description: 'Eye care and vision treatments', icon: 'eye' },
+  { name: 'Ayurveda', description: 'Traditional Indian medicine and wellness', icon: 'leaf' },
+  { name: 'Emergency', description: '24/7 emergency medical services', icon: 'ambulance' }
+];
 
 // Utility functions
-const getRandomElement = (array) => array[Math.floor(Math.random() * array.length)];
+const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const getRandomDate = (start, end) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
-const getRandomDate = (start, end) => {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+// Generate Indian phone numbers
+const generateIndianPhone = () => {
+  const prefixes = ['98', '97', '96', '95', '94', '93', '92', '91', '90', '89'];
+  const prefix = getRandomElement(prefixes);
+  const number = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+  return `+91${prefix}${number}`;
 };
 
-const getRandomPhoneNumber = () => {
-  return `+1${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`;
+// Generate Indian addresses
+const generateIndianAddress = () => {
+  const areas = ['Koramangala', 'Indiranagar', 'MG Road', 'Brigade Road', 'Whitefield', 'Electronic City', 
+                'Jayanagar', 'Malleswaram', 'HSR Layout', 'BTM Layout', 'Sector 18', 'CP', 'Karol Bagh'];
+  const area = getRandomElement(areas);
+  const city = getRandomElement(indianCities);
+  const pincode = getRandomNumber(100001, 999999);
+  return `${getRandomNumber(1, 999)}, ${area}, ${city} - ${pincode}`;
 };
 
 const getRandomEmail = (firstName, lastName, index = 0) => {
-  const domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com'];
+  const domains = ['gmail.com', 'yahoo.co.in', 'rediffmail.com', 'hotmail.com', 'outlook.com'];
   const randomNum = Math.floor(Math.random() * 1000) + index;
   return `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${randomNum}@${getRandomElement(domains)}`;
 };
 
+// Department creation function
+const createDepartments = async () => {
+  console.log('Creating Indian medical departments...');
+  
+  // Clear existing departments
+  await Department.deleteMany({});
+  
+  const departments = await Department.insertMany(indianDepartments);
+  console.log(`✅ Created ${departments.length} departments`);
+  return departments;
+};
+
 // Data generation functions
 const generatePatients = async (count = 100) => {
-  console.log(`Generating ${count} patients...`);
+  console.log(`Generating ${count} Indian patients...`);
   const patients = [];
   
   for (let i = 0; i < count; i++) {
-    const firstName = getRandomElement(firstNames);
-    const lastName = getRandomElement(lastNames);
+    const firstName = getRandomElement(indianFirstNames);
+    const lastName = getRandomElement(indianLastNames);
     
     const patient = new User({
       name: `${firstName} ${lastName}`,
       email: getRandomEmail(firstName, lastName, i),
       password: await bcrypt.hash('patient123', 10),
       role: 'patient',
-      phoneNumber: getRandomPhoneNumber(),
+      phoneNumber: generateIndianPhone(),
       dateOfBirth: getRandomDate(new Date('1950-01-01'), new Date('2005-12-31')),
       gender: Math.random() > 0.5 ? 'male' : 'female',
-      address: `${Math.floor(Math.random() * 9999 + 1)} Main St, ${getRandomElement(cities)}`,
+      address: generateIndianAddress(),
       emergencyContact: {
-        name: `${getRandomElement(firstNames)} ${getRandomElement(lastNames)}`,
+        name: `${getRandomElement(indianFirstNames)} ${getRandomElement(indianLastNames)}`,
         relationship: getRandomElement(['spouse', 'parent', 'sibling', 'child', 'friend']),
-        phoneNumber: getRandomPhoneNumber()
+        phoneNumber: generateIndianPhone()
       },
       medicalHistory: [
-        getRandomElement(['Hypertension', 'Diabetes', 'Asthma', 'Allergies', 'Heart Disease', 'None'])
+        getRandomElement(['Type 2 Diabetes', 'Hypertension', 'Asthma', 'Thyroid', 'Heart Disease', 'Arthritis', 'None'])
       ],
       isActive: Math.random() > 0.05, // 95% active
       createdAt: getRandomDate(new Date('2023-01-01'), new Date())
@@ -110,8 +148,8 @@ const generatePatients = async (count = 100) => {
   return patients;
 };
 
-const generateDoctors = async (departments, count = 10) => {
-  console.log(`Generating ${count} doctors...`);
+const generateDoctors = async (departments, count = 15) => {
+  console.log(`Generating ${count} Indian doctors...`);
   const doctors = [];
   
   const timeSlots = [
@@ -120,11 +158,11 @@ const generateDoctors = async (departments, count = 10) => {
     '15:00-15:30', '15:30-16:00', '16:00-16:30', '16:30-17:00'
   ];
   
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   
   for (let i = 0; i < count; i++) {
-    const firstName = getRandomElement(firstNames);
-    const lastName = getRandomElement(lastNames);
+    const firstName = getRandomElement(indianFirstNames);
+    const lastName = getRandomElement(indianLastNames);
     const department = getRandomElement(departments);
     
     // Generate available slots for each day
@@ -138,14 +176,15 @@ const generateDoctors = async (departments, count = 10) => {
       email: getRandomEmail(firstName, lastName, i + 1000),
       password: await bcrypt.hash('doctor123', 10),
       role: 'doctor',
-      phoneNumber: getRandomPhoneNumber(),
+      phoneNumber: generateIndianPhone(),
       dateOfBirth: getRandomDate(new Date('1960-01-01'), new Date('1990-12-31')),
       gender: Math.random() > 0.5 ? 'male' : 'female',
-      specialization: getRandomElement(specializations),
+      address: generateIndianAddress(),
+      specialization: getRandomElement(medicalSpecializations),
       department: department._id,
-      licenseNumber: `MD${Math.floor(Math.random() * 900000 + 100000)}`,
+      licenseNumber: `IMA${Math.floor(Math.random() * 900000 + 100000)}`, // Indian Medical Association
       experience: Math.floor(Math.random() * 25 + 5), // 5-30 years
-      consultationFee: Math.floor(Math.random() * 200 + 100), // $100-$300
+      consultationFee: Math.floor(Math.random() * 1000 + 500), // ₹500-₹1500
       availableSlots,
       isActive: true,
       createdAt: getRandomDate(new Date('2022-01-01'), new Date())
@@ -155,7 +194,7 @@ const generateDoctors = async (departments, count = 10) => {
   }
   
   await User.insertMany(doctors);
-  console.log(`✅ Created ${count} doctors`);
+  console.log(`✅ Created ${count} Indian doctors`);
   return doctors;
 };
 
@@ -165,7 +204,7 @@ const generateHealthRecords = async (patients, count = 500) => {
   
   for (let i = 0; i < count; i++) {
     const patient = getRandomElement(patients);
-    const type = getRandomElement(healthRecordTypes);
+    const type = getRandomElement(indianHealthRecordTypes);
     
     let value, unit;
     switch (type) {
@@ -260,7 +299,7 @@ const generateAppointments = async (patients, doctors, departments, count = 70) 
       department: department._id,
       appointmentDate,
       timeSlot: getRandomElement(timeSlots),
-      reason: getRandomElement(appointmentReasons),
+      reason: getRandomElement(commonIndianHealthIssues),
       status,
       notes: status === 'completed' ? 'Appointment completed successfully' : '',
       prescription: status === 'completed' && Math.random() > 0.5 ? 
@@ -488,8 +527,11 @@ const generateNotifications = async (users, appointments, count = 400) => {
 // Main seeding function
 const seedDatabase = async () => {
   try {
-    // Connect to MongoDB using environment variables
-    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/medimitra';
+    // Connect to MongoDB using environment variable or fallback
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/medimitra';
+    if (!process.env.MONGODB_URI) {
+      console.log('⚠️  Warning: Using local MongoDB. Set MONGODB_URI environment variable for production.');
+    }
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -506,12 +548,8 @@ const seedDatabase = async () => {
     await Reminder.deleteMany({});
     await Notification.deleteMany({});
 
-    // Get existing departments
-    const departments = await Department.find();
-    if (departments.length === 0) {
-      console.log('❌ No departments found. Please run the department seeding script first.');
-      return;
-    }
+    // Create departments
+    const departments = await createDepartments();
 
     console.log('🚀 Starting data generation...');
     
@@ -539,8 +577,8 @@ const seedDatabase = async () => {
     console.log(`✅ Notifications: 400`);
     
     console.log('\n🔑 Login Credentials:');
-    console.log('👨‍⚕️ Sample Doctor: doctor.john.smith@gmail.com / doctor123');
-    console.log('👤 Sample Patient: patient.jane.doe@gmail.com / patient123');
+    console.log('👨‍⚕️ Sample Doctor: doctor.rajesh.sharma@gmail.com / doctor123');
+    console.log('👤 Sample Patient: patient.priya.patel@gmail.com / patient123');
     console.log('👑 Admin: admin@medimitra.com / admin123');
 
   } catch (error) {

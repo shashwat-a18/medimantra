@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/DashboardLayout';
-import { API_CONFIG } from '../../utils/api';
+import { createApiUrl, createApiHeaders } from '../../utils/api';
 import { Card, Button, Input, HealthMetricCard, Badge } from '../../components/ui/ModernComponents';
 import axios from 'axios';
 
@@ -61,7 +61,7 @@ export default function HealthTracking() {
 
   const fetchHealthRecords = async () => {
     try {
-      const response = await axios.get(`${API_CONFIG.BASE_URL}/health`, {
+      const response = await axios.get(createApiUrl('/health'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       setHealthRecords(response.data.records || []);
@@ -97,11 +97,11 @@ export default function HealthTracking() {
 
     try {
       if (editingRecord) {
-        await axios.put(`${API_CONFIG.BASE_URL}/health/${editingRecord._id}`, recordData, {
+        await axios.put(createApiUrl(`/health/${editingRecord._id}`), recordData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        await axios.post(`${API_CONFIG.BASE_URL}/health`, recordData, {
+        await axios.post(createApiUrl('/health'), recordData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
@@ -147,7 +147,7 @@ export default function HealthTracking() {
     if (!confirm('Are you sure you want to delete this health record?')) return;
 
     try {
-      await axios.delete(`${API_CONFIG.BASE_URL}/health/${id}`, {
+      await axios.delete(createApiUrl(`/health/${id}`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchHealthRecords();
