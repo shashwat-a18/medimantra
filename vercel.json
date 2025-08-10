@@ -2,7 +2,7 @@
   "framework": "nextjs",
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/.next",
-  "installCommand": "cd client && npm install --legacy-peer-deps",
+  "installCommand": "cd client && npm install",
   "devCommand": "cd client && npm run dev",
   "functions": {
     "client/pages/api/**/*.js": {
