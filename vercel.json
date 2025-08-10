@@ -2,7 +2,7 @@
   "framework": "nextjs",
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/.next",
-  "installCommand": "cd client && npm install",
+  "installCommand": "cd client && npm install && npm install --save-dev typescript @types/react @types/node @types/react-dom",
   "devCommand": "cd client && npm run dev",
   "env": {
     "NEXT_PUBLIC_API_URL": "https://medimitra-y0bh.onrender.com/api",
