@@ -5,7 +5,6 @@
   "description": "MediMitra Pro - Medical Health Tracker Frontend",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm install --save-dev typescript @types/react @types/node @types/react-dom",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
