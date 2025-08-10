@@ -1,5 +1,6 @@
 const Reminder = require('../models/Reminder');
 const cron = require('node-cron');
+const { sendReminderEmail } = require('../utils/emailService');
 
 // Store active cron jobs
 const cronJobs = new Map();
@@ -267,12 +268,12 @@ const cancelScheduledReminder = (reminderId) => {
 // Send reminder notification
 const sendReminderNotification = async (reminder) => {
   try {
-    // Get user details for logging
+    // Get user details for email
     const User = require('../models/User');
     const user = await User.findById(reminder.userId);
     
-    if (user) {
-      console.log(`Reminder sent for user: ${user.name} - ${reminder.title}`);
+    if (user && user.email) {
+      await sendReminderEmail(user.email, user.name, reminder);
     }
   } catch (error) {
     console.error('Send reminder notification error:', error);

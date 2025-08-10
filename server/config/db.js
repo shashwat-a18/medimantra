@@ -3,13 +3,12 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
     // Skip MongoDB connection if no URI is provided (development mode)
-    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
-    if (!mongoUri) {
+    if (!process.env.MONGO_URI) {
       console.log('⚠️  MongoDB URI not found - running without database (development mode)');
       return null;
     }
 
-    const conn = await mongoose.connect(mongoUri);
+    const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {

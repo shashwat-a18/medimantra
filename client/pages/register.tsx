@@ -45,7 +45,7 @@ export default function Register() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: formData.role
+        role: formData.role as 'patient' | 'doctor'
       });
       router.push('/dashboard');
     } catch (err: any) {

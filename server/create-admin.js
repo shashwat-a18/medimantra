@@ -20,15 +20,14 @@ const createAdminUser = async () => {
     if (existingAdmin) {
       console.log('⚠️  Admin user already exists!');
       console.log('📧 Email: shashwatawasthi18@gmail.com');
-      console.log('🔑 Password: Use ADMIN_PASSWORD environment variable');
+      console.log('🔑 Password: Awasthi5419');
       await mongoose.connection.close();
       return;
     }
 
     // Create Admin User (Shashwat)
     console.log('👑 Creating admin user...');
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    const hashedPassword = await bcrypt.hash('Awasthi5419', 10);
     
     const adminUser = await User.create({
       name: 'Shashwat Awasthi',
@@ -45,7 +44,7 @@ const createAdminUser = async () => {
     console.log('✅ Admin user created successfully!');
     console.log('\n🔑 Admin Login Credentials:');
     console.log('📧 Email: shashwatawasthi18@gmail.com');
-    console.log('🔒 Password: Use ADMIN_PASSWORD environment variable');
+    console.log('🔒 Password: Awasthi5419');
     console.log('👑 Role: Admin');
     console.log(`🆔 User ID: ${adminUser._id}`);
 

@@ -163,7 +163,7 @@ const DoctorSchedulePage: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 p-4 rounded-lg shadow-sm border flex items-center justify-between">
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 p-4 rounded-lg shadow-sm flex items-center justify-between">
           <button
             onClick={() => navigateWeek('prev')}
             className="flex items-center px-3 py-2 text-sm text-gray-400 hover:text-white"
@@ -194,7 +194,7 @@ const DoctorSchedulePage: React.FC = () => {
 
         {/* Weekly Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm border p-4">
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
               <span className="text-blue-600 text-xl mr-2">📅</span>
               <div>
@@ -205,7 +205,7 @@ const DoctorSchedulePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm border p-4">
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
               <span className="text-green-600 text-xl mr-2">✅</span>
               <div>
@@ -218,7 +218,7 @@ const DoctorSchedulePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm border p-4">
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
               <span className="text-blue-600 text-xl mr-2">🟢</span>
               <div>
@@ -231,7 +231,7 @@ const DoctorSchedulePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm border p-4">
+          <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
               <span className="text-gray-400 text-xl mr-2">🔴</span>
               <div>
@@ -247,7 +247,7 @@ const DoctorSchedulePage: React.FC = () => {
         </div>
 
         {/* Schedule Grid */}
-        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm border overflow-hidden">
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead className="bg-slate-800/30 border-b">
@@ -328,7 +328,7 @@ const DoctorSchedulePage: React.FC = () => {
         </div>
 
         {/* Legend */}
-        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm border p-4">
+        <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-lg shadow-sm p-4">
           <h3 className="text-sm font-medium text-white mb-3">Legend</h3>
           <div className="flex flex-wrap gap-4 text-xs">
             <div className="flex items-center">
