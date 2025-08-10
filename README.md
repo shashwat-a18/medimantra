@@ -1,4 +1,4 @@
-# Medical Health Tracker (MediMitra)
+# Medical Health Tracker (MediMantra)
 
 ## Project Creator
 **Shashwat Awasthi**
@@ -40,8 +40,8 @@ A comprehensive Medical Health Tracker platform enabling users to track health v
 ### Installation
 1. **Clone Repository:**
    ```bash
-   git clone https://github.com/shashwat-a18/medimitra.git
-   cd medimitra
+   git clone https://github.com/shashwat-a18/medimantra.git
+   cd medimantra
    ```
 
 2. **Install Dependencies:**
@@ -181,7 +181,7 @@ cd ml-server && python app.py
 ## Project Structure
 
 ```
-medimitra/
+medimantra/
 ├── client/                 # Next.js Frontend Application
 │   ├── components/         # Reusable React components
 │   ├── pages/             # Next.js pages and API routes

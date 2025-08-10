@@ -19,7 +19,7 @@ const nextConfig = {
   
   // Image optimization
   images: {
-    domains: ['localhost', 'medimitra-y0bh.onrender.com'],
+    domains: ['localhost', 'medimantra-y0bh.onrender.com'],
     unoptimized: true,
   },
   

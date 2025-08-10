@@ -56,9 +56,9 @@ const defaultAuthContext: AuthContextType = {
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 // Storage keys
-const TOKEN_KEY = 'medimitra_token';
-const USER_KEY = 'medimitra_user';
-const LAST_ACTIVITY_KEY = 'medimitra_last_activity';
+const TOKEN_KEY = 'medimantra_token';
+const USER_KEY = 'medimantra_user';
+const LAST_ACTIVITY_KEY = 'medimantra_last_activity';
 
 // Auth provider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

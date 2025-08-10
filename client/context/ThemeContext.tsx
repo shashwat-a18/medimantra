@@ -29,7 +29,7 @@ const defaultThemeContext: ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType>(defaultThemeContext);
 
 // Storage key
-const THEME_STORAGE_KEY = 'medimitra_theme';
+const THEME_STORAGE_KEY = 'medimantra_theme';
 
 // Theme provider component
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build and prepare for deployment
 
-echo "🚀 Preparing MediMitra for deployment..."
+echo "🚀 Preparing MediMantra for deployment..."
 
 # Check if we're in the right directory
 if [ ! -f "package.json" ]; then
