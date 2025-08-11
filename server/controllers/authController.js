@@ -41,6 +41,7 @@ const register = async (req, res) => {
       const token = generateToken(mockUser.id);
       
       return res.status(201).json({
+        success: true,
         message: 'User registered successfully (development mode)',
         token,
         user: mockUser
@@ -95,6 +96,7 @@ const register = async (req, res) => {
     const token = generateToken(user._id);
 
     res.status(201).json({
+      success: true,
       message: 'User registered successfully',
       token,
       user: {
@@ -135,6 +137,7 @@ const login = async (req, res) => {
       const token = generateToken(mockUser.id);
       
       return res.json({
+        success: true,
         message: 'Login successful (development mode)',
         token,
         user: mockUser
@@ -162,6 +165,7 @@ const login = async (req, res) => {
     const token = generateToken(user._id);
 
     res.json({
+      success: true,
       message: 'Login successful',
       token,
       user: {
