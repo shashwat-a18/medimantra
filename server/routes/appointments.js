@@ -1,3 +1,5 @@
+// Public route for appointments with status query (for dashboard)
+router.get('/', auth, appointmentController.getAppointmentsByStatus);
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');

@@ -1,3 +1,7 @@
+// Health check endpoint
+router.get('/', (req, res) => {
+  res.json({ status: 'healthy', message: 'Health API is running', timestamp: new Date().toISOString() });
+});
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
