@@ -1,9 +1,4 @@
-// Health check endpoint
-router.get('/', (req, res) => {
-  res.json({ status: 'healthy', message: 'Health API is running', timestamp: new Date().toISOString() });
-});
 const express = require('express');
-const router = express.Router();
 const auth = require('../middleware/auth');
 const { 
   addHealthRecord,
@@ -13,6 +8,11 @@ const {
   deleteHealthRecord,
   getHealthStats
 } = require('../controllers/healthController');
+const router = express.Router();
+// Health check endpoint
+router.get('/', (req, res) => {
+  res.json({ status: 'healthy', message: 'Health API is running', timestamp: new Date().toISOString() });
+});
 
 // @route   POST /api/health/records
 // @desc    Add a new health record
