@@ -1,5 +1,7 @@
 # Medical Health Tracker (MediMantra)
 
+## Deployed at: https://medimantra.vercel.app/
+
 ## Project Creator
 **Shashwat Awasthi**
 - 🔗 **GitHub**: [https://github.com/shashwat-a18](https://github.com/shashwat-a18)
